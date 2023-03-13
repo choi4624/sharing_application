@@ -1,0 +1,10 @@
+C:/FlutterSrc/sharing_application-ui/build/windows/CMakeFiles/INSTALL.dir
+C:/FlutterSrc/sharing_application-ui/build/windows/CMakeFiles/ALL_BUILD.dir
+C:/FlutterSrc/sharing_application-ui/build/windows/CMakeFiles/ZERO_CHECK.dir
+C:/FlutterSrc/sharing_application-ui/build/windows/flutter/CMakeFiles/flutter_wrapper_plugin.dir
+C:/FlutterSrc/sharing_application-ui/build/windows/flutter/CMakeFiles/flutter_wrapper_app.dir
+C:/FlutterSrc/sharing_application-ui/build/windows/flutter/CMakeFiles/flutter_assemble.dir
+C:/FlutterSrc/sharing_application-ui/build/windows/flutter/CMakeFiles/INSTALL.dir
+C:/FlutterSrc/sharing_application-ui/build/windows/runner/CMakeFiles/flutter_application_1.dir
+C:/FlutterSrc/sharing_application-ui/build/windows/runner/CMakeFiles/INSTALL.dir
+C:/FlutterSrc/sharing_application-ui/build/windows/runner/CMakeFiles/ALL_BUILD.dir
