@@ -1,0 +1,138 @@
+{    
+    "sell": [
+      {
+        "userId": "id01",
+        "board_writer": "user01",
+        "image": "assets/images/ex1.png",
+        "board_title": "판매 제품 A",
+        "board_contents": "내용",
+        "location": "경기도 안양시 동안구",
+        "price": 120000,
+        "like": 1,
+        "board_hits": 1,
+        "create_time": " ",
+        "update_time": " "
+      },
+      {
+        "userId": "id02",
+        "board_writer": "user02",
+        "image": "assets/images/ex1.png",
+        "board_title": "판매 제품 B",
+        "board_contents": "내용",
+        "location": "경기도 안양시 동안구",
+        "price": 120000,
+        "like": 0,
+        "board_hits": 0,
+        "create_time": " ",
+        "update_time": " "
+      },
+      {
+        "userId": "id03",
+        "board_writer": "user03",
+        "image": "assets/images/ex1.png",
+        "board_title": "판매 제품 C",
+        "board_contents": "내용",
+        "location": "경기도 안양시 동안구",
+        "price": 120000,
+        "like": 0,
+        "board_hits": 0,
+        "create_time": " ",
+        "update_time": " "
+      },
+      {
+        "userId": "id04",
+        "board_writer": "user04",
+        "image": "assets/images/ex1.png",
+        "board_title": "판매 제품 D",
+        "board_contents": "내용",
+        "location": "경기도 안양시 동안구",
+        "price": 120000,
+        "like": 0,
+        "board_hits": 0,
+        "create_time": " ",
+        "update_time": " "
+      }
+    ],
+    "buy": [
+      {
+        "userId": "id05",
+        "board_writer": "user05",
+        "image": "assets/images/ex1.png",
+        "board_title": "구매 제품 A",
+        "board_contents": "내용",
+        "location": "경기도 안양시 동안구",
+        "price": 120000,
+        "like": 0,
+        "board_hits": 0,
+        "create_time": " ",
+        "update_time": " "
+      },
+      {
+        "userId": "id06",
+        "board_writer": "user06",
+        "image": "assets/images/ex1.png",
+        "board_title": "구매 제품 B",
+        "board_contents": "내용",
+        "location": "경기도 안양시 동안구",
+        "price": 120000,
+        "like": 0,
+        "board_hits": 0,
+        "create_time": " ",
+        "update_time": " "
+      },
+      {
+        "userId": "id07",
+        "board_writer": "user07",
+        "image": "assets/images/ex1.png",
+        "board_title": "구매 제품 C",
+        "board_contents": "내용",
+        "location": "경기도 안양시 동안구",
+        "price": 120000,
+        "like": 0,
+        "board_hits": 0,
+        "create_time": " ",
+        "update_time": " "
+      }
+    ],
+    "rental": [
+      {
+        "userId": "id08",
+        "board_writer": "user08",
+        "image": "assets/images/ex1.png",
+        "board_title": "대여 제품 A",
+        "board_contents": "내용",
+        "location": "경기도 안양시 동안구",
+        "price": 120000,
+        "like": 0,
+        "board_hits": 0,
+        "create_time": " ",
+        "update_time": " "
+      },
+      {
+        "userId": "id09",
+        "board_writer": "user09",
+        "image": "assets/images/ex1.png",
+        "board_title": "대여 제품 B",
+        "board_contents": "내용",
+        "location": "경기도 안양시 동안구",
+        "price": 120000,
+        "like": 0,
+        "board_hits": 0,
+        "create_time": " ",
+        "update_time": " "
+      },
+      {
+        "userId": "id10",
+        "board_writer": "user10",
+        "image": "assets/images/ex1.png",
+        "board_title": "대여 제품 C",
+        "board_contents": "내용",
+        "location": "경기도 안양시 동안구",
+        "price": 120000,
+        "like": 0,
+        "board_hits": 0,
+        "create_time": " ",
+        "update_time": " "
+      }
+    ]
+  }

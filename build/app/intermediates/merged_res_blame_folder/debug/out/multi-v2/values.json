@@ -4,25 +4,6 @@
             "outputFile": "com.example.flutter_application_1.app-mergeDebugResources-12:/values/values.xml",
             "map": [
                 {
-                    "source": "/Users/alme/VSCode/NeodoNado/android/app/src/main/res/values/styles.xml",
-                    "from": {
-                        "startLines": "3,14",
-                        "startColumns": "4,4",
-                        "startOffsets": "173,818",
-                        "endLines": "7,16",
-                        "endColumns": "12,12",
-                        "endOffsets": "476,982"
-                    },
-                    "to": {
-                        "startLines": "103,107",
-                        "startColumns": "4,4",
-                        "startOffsets": "6151,6332",
-                        "endLines": "106,109",
-                        "endColumns": "12,12",
-                        "endOffsets": "6327,6496"
-                    }
-                },
-                {
                     "source": "/Users/alme/.gradle/caches/transforms-3/76da31ad033c53187dd7271282d0f7d2/transformed/lifecycle-runtime-2.3.1/res/values/values.xml",
                     "from": {
                         "startLines": "2",
@@ -92,6 +73,25 @@
                         "startOffsets": "5434,5504,5566,5631,5695,5772,5837,5927,6011",
                         "endColumns": "69,61,64,63,76,64,89,83,68",
                         "endOffsets": "5499,5561,5626,5690,5767,5832,5922,6006,6075"
+                    }
+                },
+                {
+                    "source": "/Users/alme/VSCode/NeodoNado(Alme-Test)/android/app/src/main/res/values/styles.xml",
+                    "from": {
+                        "startLines": "3,14",
+                        "startColumns": "4,4",
+                        "startOffsets": "173,818",
+                        "endLines": "7,16",
+                        "endColumns": "12,12",
+                        "endOffsets": "476,982"
+                    },
+                    "to": {
+                        "startLines": "103,107",
+                        "startColumns": "4,4",
+                        "startOffsets": "6151,6332",
+                        "endLines": "106,109",
+                        "endColumns": "12,12",
+                        "endOffsets": "6327,6496"
                     }
                 }
             ]

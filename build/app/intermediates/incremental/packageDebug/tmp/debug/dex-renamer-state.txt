@@ -1,4 +1,4 @@
-#Mon Mar 13 16:40:51 KST 2023
-base.0=/Users/alme/VSCode/NeodoNado/build/app/intermediates/dex/debug/mergeDexDebug/classes.dex
+#Tue Mar 21 21:49:10 KST 2023
+base.0=/Users/alme/VSCode/NeodoNado(Alme-Test)/build/app/intermediates/dex/debug/mergeDexDebug/classes.dex
 renamed.0=classes.dex
 path.0=classes.dex

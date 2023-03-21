@@ -3,7 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:test_project/page/chat.dart';
 import 'package:test_project/page/home.dart';
 import 'package:test_project/page/mapview.dart';
-import 'package:test_project/page/user.dart';
+import 'package:test_project/page/test.dart';
 import 'package:test_project/page/write.dart';
 
 class Control extends StatefulWidget {
@@ -21,7 +21,7 @@ class _ControlState extends State<Control> {
   Widget _bodyWidget() {
     switch (_currentPageIndex) {
       case 0:
-        return const Home();
+        return Home();
       case 1:
         return const Write();
       case 2:
@@ -29,9 +29,10 @@ class _ControlState extends State<Control> {
       case 3:
         return const Chat();
       case 4:
-        return const User();
+        return const Test();
+      //User();
       default:
-        return const Home();
+        return Home();
     }
   }
 

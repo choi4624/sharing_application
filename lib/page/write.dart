@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:test_project/page/control.dart';
 import 'package:test_project/repository/contents_repository.dart';
 
 class Write extends StatefulWidget {
@@ -13,15 +14,18 @@ class _WriteState extends State<Write> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
+  final TextEditingController _categoryController = TextEditingController();
   late String title;
   late String location;
   late String price;
+  late String category;
 
   // textfield에서 입력받은 데이터를 변수에 저장하는 함수
   void _submitData() {
     title = _titleController.text;
     location = _locationController.text;
     price = _priceController.text;
+    category = _categoryController.text;
     // 서버로 보내는 함수 작성(추가 예정)
     // void _summitToServer(){}
   }
@@ -29,17 +33,22 @@ class _WriteState extends State<Write> {
   // ContensRepository에 새로운 데이터 추가하는 함수
   void _addData({
     //required String image,
+    required String category,
     required String title,
     required String location,
     required String price,
   }) {
-    ContensRepository.datas.add({
-      'image': "assets/images/ex1.png", // 사진 첨수 기능 만들어야함
-      'title': title,
-      'location': location,
-      'price': price,
-      'like': "0", // 초기값 = 0, 이후 서버로부터 갱신 필요
-    });
+    ContentsRepository().datas['"$category"'].add(
+      {
+        'image': "assets/images/ex1.png", // 사진 첨수 기능 만들어야함
+        'title': title,
+        'location': location, // 주소 검색 api 적용 필요
+        'price': price,
+        'like': "0", // 초기값 = 0, 이후 서버로부터 갱신 필요
+      },
+    );
+    print('"$category"');
+    print(ContentsRepository().datas["sell"]);
   }
   //Navigator.pop(context);
 
@@ -87,6 +96,25 @@ class _WriteState extends State<Write> {
                     ),
                   ),
                 ),
+                Flexible(
+                  flex: 5,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      controller: _categoryController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.black,
+                          ),
+                        ),
+                        hintText: "카테고리를 입력해주세요",
+                      ),
+                      textInputAction: TextInputAction.next,
+                      onSubmitted: (value) => _categoryController,
+                    ),
+                  ),
+                ),
                 // Location textfield
                 Flexible(
                   flex: 5,
@@ -100,7 +128,7 @@ class _WriteState extends State<Write> {
                             color: Colors.black,
                           ),
                         ),
-                        hintText: "주소를 입력해주세요",
+                        hintText: "주소를 입력해주세요 / 주소 입력 API 사용",
                       ),
                       textInputAction: TextInputAction.next,
                     ),
@@ -119,7 +147,7 @@ class _WriteState extends State<Write> {
                             color: Colors.black,
                           ),
                         ),
-                        hintText: "가격을 입력해주세요",
+                        hintText: "가격을 입력해주세요 / 숫자 입력 키보드 출력",
                       ),
                       textInputAction: TextInputAction.next,
                     ),
@@ -156,9 +184,15 @@ class _WriteState extends State<Write> {
                         _submitData();
                         _addData(
                           title: title,
+                          // ignore: unnecessary_string_interpolations
+                          category: category,
                           location: location,
                           price: price,
                         );
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const Control()));
                       },
                       child: const Text(
                         "Done",
