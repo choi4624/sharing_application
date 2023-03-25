@@ -4,7 +4,6 @@ import 'package:test_project/page/chat.dart';
 import 'package:test_project/page/home.dart';
 import 'package:test_project/page/mapview.dart';
 import 'package:test_project/page/user.dart';
-import 'package:test_project/page/login.dart';
 import 'package:test_project/page/write.dart';
 
 class Control extends StatefulWidget {
@@ -22,19 +21,17 @@ class _ControlState extends State<Control> {
   Widget _bodyWidget() {
     switch (_currentPageIndex) {
       case 0:
-        return const LogIn();
-      case 1:
         return const Home();
-      case 2:
+      case 1:
         return const Write();
-      case 3:
+      case 2:
         return const MapView();
-      case 4:
+      case 3:
         return const Chat();
-      case 5:
+      case 4:
         return const User();
       default:
-        return const LogIn();
+        return const Home();
     }
   }
 
@@ -62,14 +59,11 @@ class _ControlState extends State<Control> {
           _currentPageIndex = index;
         });
       },
-      /* showSelectedLabels: false,
-      showUnselectedLabels: false, //아이콘만 보이게 */
       currentIndex: _currentPageIndex,
       selectedItemColor: Colors.black,
       selectedFontSize: 12,
       selectedLabelStyle: const TextStyle(color: Colors.black),
       items: [
-        _bottomNavigationBarItem("login", "로그인"),
         _bottomNavigationBarItem("home", "홈"),
         _bottomNavigationBarItem("notes", "글 작성"),
         _bottomNavigationBarItem("location", "지도"),

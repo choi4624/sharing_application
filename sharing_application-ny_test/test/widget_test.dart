@@ -7,9 +7,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:test_project/main.dart';
 
 //import 'package:flutter_application_1/main.dart';
-import 'package:test_project/main.dart'; //오류땜에 추가한거라 필요없으면 삭제하셔도 무방
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {

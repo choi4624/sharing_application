@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
+import 'package:test_project/repository/contents_repository.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -10,70 +11,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List<Map<dynamic, dynamic>> datas = [];
-
-  // datas에 입력 데이터를 넣는 함수
-  void _addData(
-      String image, String title, String location, String price, bool like) {
-    datas.add({
-      'image': image,
-      'title': title,
-      'location': location,
-      'price': price,
-      'like': like,
-    });
-  }
-
-  // 임시 - json타입을 통해 데이터 받아오기
-  @override
-  void initState() {
-    super.initState();
-    datas = [
-      {
-        "image": "assets/images/ex1.png",
-        "title": "제품명",
-        "location": "경기도 안양시 동안구",
-        "price": "30000",
-        "like": "5",
-      },
-      {
-        "image": "assets/images/ex1.png",
-        "title": "제품명",
-        "location": "경기도 안양시 동안구",
-        "price": "30000",
-        "like": "5",
-      },
-      {
-        "image": "assets/images/ex1.png",
-        "title": "제품명",
-        "location": "경기도 안양시 동안구",
-        "price": "30000",
-        "like": "5",
-      },
-      {
-        "image": "assets/images/ex1.png",
-        "title": "제품명",
-        "location": "경기도 안양시 동안구",
-        "price": "30000",
-        "like": "5",
-      },
-      {
-        "image": "assets/images/ex1.png",
-        "title": "제품명",
-        "location": "경기도 안양시 동안구",
-        "price": "30000",
-        "like": "5",
-      },
-      {
-        "image": "assets/images/ex1.png",
-        "title": "제품명",
-        "location": "경기도 안양시 동안구",
-        "price": "30000",
-        "like": "5",
-      },
-    ];
-  }
-
   PreferredSizeWidget _appbarWidget() {
     return AppBar(
       //leading: ,
@@ -108,9 +45,11 @@ class _HomeState extends State<Home> {
     );
   }
 
-  // 원화 계산 라이브러리
-  final oCcy = NumberFormat("#,###", "ko_KR");
-  // 원화 계산 함수
+  // 원화 계산 라이브러리 & 원화 계산 함수
+  final oCcy = NumberFormat(
+    "#,###",
+    "ko_KR",
+  );
   String calcStringToWon(String priceString) {
     return "${oCcy.format(int.parse(priceString))}원";
   }
@@ -129,7 +68,7 @@ class _HomeState extends State<Home> {
                   Radius.circular(10),
                 ),
                 child: Image.asset(
-                  datas[index]["image"]!,
+                  ContensRepository.datas[index]["image"]!,
                   width: 100,
                   height: 100,
                 ),
@@ -142,7 +81,7 @@ class _HomeState extends State<Home> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        datas[index]["title"]!,
+                        ContensRepository.datas[index]["title"]!,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 15,
@@ -152,7 +91,7 @@ class _HomeState extends State<Home> {
                         height: 5,
                       ),
                       Text(
-                        datas[index]["location"]!,
+                        ContensRepository.datas[index]["location"]!,
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.black.withOpacity(0.3),
@@ -162,7 +101,8 @@ class _HomeState extends State<Home> {
                         height: 5,
                       ),
                       Text(
-                        calcStringToWon(datas[index]["price"]!),
+                        calcStringToWon(
+                            ContensRepository.datas[index]["price"]!),
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
@@ -184,7 +124,7 @@ class _HomeState extends State<Home> {
                               width: 5,
                             ),
                             Text(
-                              datas[index]["like"]!,
+                              ContensRepository.datas[index]["like"]!,
                             ),
                           ],
                         ),
@@ -197,7 +137,7 @@ class _HomeState extends State<Home> {
           ),
         );
       },
-      itemCount: datas.length, // 상품 목록의 개수
+      itemCount: ContensRepository.datas.length, // 상품 목록의 개수
       separatorBuilder: (BuildContext context, int index) {
         return Container(
           height: 1,
@@ -211,11 +151,12 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {},
-          backgroundColor: Colors.blueAccent,
-          child: const Text(""),
-        ),
+        // Home 글쓰기 버튼(?)
+        // floatingActionButton: FloatingActionButton(
+        //   onPressed: () {},
+        //   backgroundColor: Colors.blueAccent,
+        //   child: const Text(""),
+        // ),
         appBar: _appbarWidget(),
         body: _bodyWidget(),
       ),

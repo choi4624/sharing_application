@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.flutter_application_1.app-mergeDebugResources-5:/values/values.xml",
+            "outputFile": "com.example.flutter_application_1.app-mergeDebugResources-12:/values/values.xml",
             "map": [
                 {
                     "source": "C:\\Users\\김난영\\.gradle\\caches\\transforms-3\\dee59bb480020f42d53c2ea15e4501f7\\transformed\\jetified-window-1.0.0-beta04\\res\\values\\values.xml",
@@ -59,7 +59,24 @@
                     }
                 },
                 {
-                    "source": "C:\\FlutterSrc\\sharing_application-ui\\android\\app\\src\\main\\res\\values\\styles.xml",
+                    "source": "C:\\Users\\김난영\\.gradle\\caches\\transforms-3\\eed6c775712772b7adb51f80912e1f44\\transformed\\jetified-exoplayer-core-2.18.1\\res\\values\\values.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9,10",
+                        "startColumns": "4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,125,187,252,316,393,458,548,632",
+                        "endColumns": "69,61,64,63,76,64,89,83,68",
+                        "endOffsets": "120,182,247,311,388,453,543,627,696"
+                    },
+                    "to": {
+                        "startLines": "93,94,95,96,97,98,99,100,101",
+                        "startColumns": "4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "5434,5504,5566,5631,5695,5772,5837,5927,6011",
+                        "endColumns": "69,61,64,63,76,64,89,83,68",
+                        "endOffsets": "5499,5561,5626,5690,5767,5832,5922,6006,6075"
+                    }
+                },
+                {
+                    "source": "C:\\gitshare\\sharing_application-ny_test\\android\\app\\src\\main\\res\\values\\styles.xml",
                     "from": {
                         "startLines": "3,14",
                         "startColumns": "4,4",
@@ -75,23 +92,6 @@
                         "endLines": "106,109",
                         "endColumns": "12,12",
                         "endOffsets": "6327,6496"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\김난영\\.gradle\\caches\\transforms-3\\eed6c775712772b7adb51f80912e1f44\\transformed\\jetified-exoplayer-core-2.18.1\\res\\values\\values.xml",
-                    "from": {
-                        "startLines": "2,3,4,5,6,7,8,9,10",
-                        "startColumns": "4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "55,125,187,252,316,393,458,548,632",
-                        "endColumns": "69,61,64,63,76,64,89,83,68",
-                        "endOffsets": "120,182,247,311,388,453,543,627,696"
-                    },
-                    "to": {
-                        "startLines": "93,94,95,96,97,98,99,100,101",
-                        "startColumns": "4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "5434,5504,5566,5631,5695,5772,5837,5927,6011",
-                        "endColumns": "69,61,64,63,76,64,89,83,68",
-                        "endOffsets": "5499,5561,5626,5690,5767,5832,5922,6006,6075"
                     }
                 }
             ]

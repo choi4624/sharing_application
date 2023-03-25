@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.flutter_application_1.app-mergeDebugResources-5:/values-km/values-km.xml",
+            "outputFile": "com.example.flutter_application_1.app-mergeDebugResources-12:/values-km/values-km.xml",
             "map": [
                 {
                     "source": "C:\\Users\\김난영\\.gradle\\caches\\transforms-3\\74ce2690f7529852b8321388684fcbb6\\transformed\\core-1.7.0\\res\\values-km\\values-km.xml",

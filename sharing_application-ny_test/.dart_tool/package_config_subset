@@ -234,10 +234,6 @@ xml
 2.16
 file:///C:/Users/%EA%B9%80%EB%82%9C%EC%98%81/AppData/Local/Pub/Cache/hosted/pub.dev/xml-5.4.1/
 file:///C:/Users/%EA%B9%80%EB%82%9C%EC%98%81/AppData/Local/Pub/Cache/hosted/pub.dev/xml-5.4.1/lib/
-test_project
-2.19
-file:///C:/Users/%EA%B9%80%EB%82%9C%EC%98%81/Desktop/sharing_application-ui/
-file:///C:/Users/%EA%B9%80%EB%82%9C%EC%98%81/Desktop/sharing_application-ui/lib/
 sky_engine
 2.12
 file:///C:/flutter/bin/cache/pkg/sky_engine/
@@ -254,4 +250,8 @@ flutter_web_plugins
 2.19
 file:///C:/flutter/packages/flutter_web_plugins/
 file:///C:/flutter/packages/flutter_web_plugins/lib/
+test_project
+2.19
+file:///C:/gitshare/sharing_application-ny_test/
+file:///C:/gitshare/sharing_application-ny_test/lib/
 2

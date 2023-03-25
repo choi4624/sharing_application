@@ -3,7 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:test_project/page/control.dart';
+import 'package:test_project/page/login.dart';
 
 // web data request
 
@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.white,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const Control(),
+      home: const LogIn(),
     );
   }
 }

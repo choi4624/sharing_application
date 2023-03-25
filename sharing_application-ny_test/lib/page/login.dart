@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:test_project/page/control.dart';
-import 'package:test_project/page/home.dart';
 
 class LogIn extends StatefulWidget {
   const LogIn({super.key});
@@ -86,11 +85,11 @@ class _LogInState extends State<LogIn> {
                                 onPressed: () {
                                   if (controller.text == 'example' &&
                                       controller2.text == '1234') {
-/*                                     Navigator.push(
+                                    Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                             builder: (BuildContext context) =>
-                                                NextPage())); */ //페이지 넘길 때 하단바가 사라져서 보류
+                                                NextPage()));
                                   } else if (controller.text == 'example' &&
                                       controller2.text != '1234') {
                                     showSnackBar(context,
@@ -135,11 +134,11 @@ void showSnackBar(BuildContext context, Text text) {
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
 
-/* class NextPage extends StatelessWidget {
+class NextPage extends StatelessWidget {
   const NextPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Home();
+    return Control();
   }
-} */ //페이지 넘길 때 하단바가 사라져서 보류
+}
