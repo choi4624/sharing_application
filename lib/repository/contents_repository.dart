@@ -1,6 +1,24 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+// Future<http.Response> fetchPost() async {
+//   var url = Uri.parse('https://ubuntu.i4624.tk/json');
+//   final response = await http.get(url);
+
+//   if (response.statusCode == 200) {
+//     // 만약 서버가 OK 응답을 반환하면, JSON을 파싱합니다.
+//     return Post.fromJson(json.decode(response.body));
+//   } else {
+//     // 만약 응답이 OK가 아니면, 에러를 던집니다.
+//     throw Exception('Failed to load post');
+//   }
+// }
+class UserInfo {
+  late String userId = "01";
+  late String userNickName = "user_1";
+  late String password;
+}
+
 class ContentsRepository {
   Map<String, dynamic> datas = {
     "sell": [
@@ -38,7 +56,6 @@ class ContentsRepository {
   Future<List<Map<String, dynamic>>> loadContentsFromLocation(
       String location) async {
     await loadData();
-    print(datas);
     return datas[location]!;
   }
 }

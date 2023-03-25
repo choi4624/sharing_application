@@ -3,7 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:test_project/page/chat.dart';
 import 'package:test_project/page/home.dart';
 import 'package:test_project/page/mapview.dart';
-import 'package:test_project/page/test.dart';
+import 'package:test_project/page/user.dart';
 import 'package:test_project/page/write.dart';
 
 class Control extends StatefulWidget {
@@ -29,8 +29,7 @@ class _ControlState extends State<Control> {
       case 3:
         return const Chat();
       case 4:
-        return const Test();
-      //User();
+        return const User();
       default:
         return Home();
     }
