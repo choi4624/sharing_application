@@ -93,11 +93,12 @@ class _HomeState extends State<Home> {
       elevation: 1, // 그림자를 표현되는 높이 3d 측면의 높이를 뜻함.
       actions: [
         IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.search,
-              color: Colors.black,
-            )),
+          onPressed: () {},
+          icon: const Icon(
+            Icons.search,
+            color: Colors.black,
+          ),
+        ),
         Padding(
           padding: const EdgeInsets.only(right: 10),
           child: IconButton(

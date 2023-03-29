@@ -428,7 +428,7 @@ class _WriteState extends State<Write> {
               // 모든 정보가 입력되었을 때
               else {
                 _saveData();
-                /**/
+                /*
                 print(image);
                 print(title);
                 print(contents);
@@ -436,6 +436,7 @@ class _WriteState extends State<Write> {
                 print(category);
                 print(transaction);
                 print(price);
+                */
                 Navigator.pop(context);
                 Navigator.push(
                   context,

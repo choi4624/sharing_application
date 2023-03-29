@@ -17,6 +17,7 @@ class UserInfo {
   late String userId = "01";
   late String userNickName = "user_1";
   late String password;
+  late String address = "경기도 안양시 동안구";
 }
 
 class ContentsRepository {
