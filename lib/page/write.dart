@@ -101,14 +101,13 @@ class _WriteState extends State<Write> {
       final response = await Dio().post(
         'https://example.com/endpoint',
         data: {
-          'userId': userId,
-          'userNickName': userNickName,
+          'id': userId,
+          'boardWriter': userNickName,
           'image': image,
-          'title': title,
-          'contents': contents,
+          'boardTitle': title,
+          'boardContents': contents,
           'category': category,
           'location': location,
-          //'createTime': createTime,
           'price': price,
         },
       );
@@ -539,7 +538,7 @@ class _WriteState extends State<Write> {
                     child: GestureDetector(
                       onTap: () {
                         print("click event");
-                        ContentsRepository().loadData();
+                        //ContentsRepository().fetchBoardList();
                       },
                       child: PopupMenuButton<String>(
                         offset: const Offset(0, 30),

@@ -42,6 +42,8 @@ dependencies:
   image_picker: ^0.8.7 #이미지 변수
   kpostal: ^0.5.1 #카카오 주소검색 
   flutter_naver_map: ^0.10.7
+  location: ^4.4.0
+  geolocator: ^9.0.2
   naver_map_plugin:
     git: https://github.com/LBSTECH/naver_map_plugin.git
   #webview_flutter: ^4.0.5

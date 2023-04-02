@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:test_project/page/detail.dart';
 import 'package:test_project/repository/contents_repository.dart';
@@ -146,16 +145,18 @@ class _HomeState extends State<Home> {
               context,
               MaterialPageRoute(
                 builder: (BuildContext context) {
-                  datas[index]["userId"];
-                  datas[index]["board_writer"];
-                  datas[index]["image"];
-                  datas[index]["board_title"];
-                  datas[index]["board_contents"];
+                  datas[index]["id"];
+                  datas[index]["boardWriter"];
+                  datas[index]["boardTitle"];
+                  datas[index]["boardContents"];
                   datas[index]["location"];
-                  datas[index]["like"];
-                  datas[index]["board_hits"];
-                  datas[index]["create_time"];
-                  datas[index]["update_time"];
+                  datas[index]["price"];
+                  datas[index]["boardHits"];
+                  datas[index]["boardCreatedTime"];
+                  datas[index]["boardUpdatedTime"];
+                  datas[index]["boardCategory"];
+                  datas[index]["image"];
+                  //datas[index]["like"];
                   return DetailContentView(data: datas[index]);
                 },
               ),
@@ -169,10 +170,11 @@ class _HomeState extends State<Home> {
                   borderRadius: const BorderRadius.all(
                     Radius.circular(10),
                   ),
-                  child: Image.asset(
-                    datas[index]["image"]!,
+                  child: Image.network(
+                    UserInfo().defaultImage, //datas[index]["image"],
                     width: 100,
                     height: 100,
+                    fit: BoxFit.cover,
                   ),
                 ),
                 Expanded(
@@ -183,7 +185,7 @@ class _HomeState extends State<Home> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          datas[index]["board_title"]!,
+                          datas[index]["boardTitle"]!,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             fontSize: 15,
@@ -216,16 +218,22 @@ class _HomeState extends State<Home> {
                             mainAxisAlignment: MainAxisAlignment.end,
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              SvgPicture.asset(
-                                "assets/svg/heart_off.svg",
-                                width: 13,
-                                height: 13,
+                              const Icon(
+                                Icons.remove_red_eye_outlined,
+                                color: Color.fromARGB(255, 64, 64, 64),
+                                size: 17,
                               ),
+                              // SvgPicture.asset(
+                              //   "assets/svg/heart_off.svg",
+                              //   width: 13,
+                              //   height: 13,
+                              // ),
                               const SizedBox(
                                 width: 5,
                               ),
                               Text(
-                                datas[index]["like"].toString(),
+                                //datas[index]["like"].toString(),
+                                datas[index]["boardHits"].toString(),
                               ),
                             ],
                           ),

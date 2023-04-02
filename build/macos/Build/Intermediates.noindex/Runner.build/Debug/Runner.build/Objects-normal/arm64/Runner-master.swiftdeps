@@ -1,8 +1,0 @@
-version: "Apple Swift version 5.7.2 (swiftlang-5.7.2.135.5 clang-1400.0.29.51)"
-options: "49dbb2ca356019e2d0c054466ce19a917fd2a77036a0fd0f7e79ec73c09c0fa9"
-build_start_time: [1677744658, 580438137]
-build_end_time: [1677744665, 643892049]
-inputs:
-  "/Users/alme/VSCode/flutter_application_1/macos/Flutter/GeneratedPluginRegistrant.swift": [1677744644, 608767747]
-  "/Users/alme/VSCode/flutter_application_1/macos/Runner/AppDelegate.swift": [1675961070, 0]
-  "/Users/alme/VSCode/flutter_application_1/macos/Runner/MainFlutterWindow.swift": [1675961070, 0]

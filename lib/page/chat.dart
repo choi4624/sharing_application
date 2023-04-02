@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:test_project/repository/contents_repository.dart';
 
 class Chat extends StatefulWidget {
   const Chat({super.key});
@@ -15,9 +16,9 @@ class _ChatState extends State<Chat> {
         backgroundColor: Colors.white,
       ),
       body: Container(
-        child: const Center(
+        child: Center(
           child: Text(
-            "채팅 페이지",
+            "${ContentsRepository().data}",
           ),
         ),
       ),

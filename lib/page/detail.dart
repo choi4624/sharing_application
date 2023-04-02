@@ -31,11 +31,12 @@ class _DetailContentViewState extends State<DetailContentView>
     _colorTween = ColorTween(begin: Colors.white, end: Colors.black)
         .animate(_animationController);
     imgList = [
-      widget.data["image"],
-      widget.data["image"],
-      widget.data["image"],
-      widget.data["image"],
-      widget.data["image"],
+      //UserInfo().defaultImage,
+      // widget.data["image"],
+      // widget.data["image"],
+      // widget.data["image"],
+      // widget.data["image"],
+      // widget.data["image"],
     ];
     _current = 0;
     // _loadMyFavoriteContentState();
@@ -147,44 +148,47 @@ class _DetailContentViewState extends State<DetailContentView>
   // }
 
   Widget _sellerSimpleInfo() {
-    return Padding(
-      padding: const EdgeInsets.only(
-        top: 80,
-        right: 15,
-        left: 15,
-        bottom: 15,
-      ),
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(50),
-            child: SizedBox(
-              width: 50,
-              height: 50,
-              child: Image.asset("assets/images/user.png"),
-            ),
-          ),
-          // CircleAvatar(
-          //   radius: 25,
-          //   backgroundImage: Image.asset("assets/images/user.png").image,
-          // ),
-          const SizedBox(width: 10),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      children: [
+        Image.network(
+          //widget.data["image"],
+          UserInfo().defaultImage,
+        ),
+        Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Row(
             children: [
-              Text(
-                widget.data["board_writer"],
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(50),
+                child: SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: Image.asset("assets/images/user.png"),
+                ),
               ),
-              Text(widget.data["location"]),
+              // CircleAvatar(
+              //   radius: 25,
+              //   backgroundImage: Image.asset("assets/images/user.png").image,
+              // ),
+              const SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.data["boardWriter"],
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  Text(widget.data["location"]),
+                ],
+              ),
+              // Expanded(
+              //   child: ManorTemperature(manorTemp: 37.3),
+              // )
             ],
           ),
-          // Expanded(
-          //   child: ManorTemperature(manorTemp: 37.3),
-          // )
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -204,14 +208,14 @@ class _DetailContentViewState extends State<DetailContentView>
         children: [
           const SizedBox(height: 20),
           Text(
-            widget.data["board_title"],
+            widget.data["boardTitle"],
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
           Text(
-            "디지털/가전 ∙ ${widget.data["create_time"]}", //category 추가 건의
+            "디지털/가전 ∙ ${widget.data["boardCreatedTime"]}", //category 추가 건의
             style: const TextStyle(
               fontSize: 12,
               color: Colors.grey,
@@ -219,24 +223,24 @@ class _DetailContentViewState extends State<DetailContentView>
           ),
           const SizedBox(height: 15),
           Text(
-            widget.data["board_contents"],
+            widget.data["boardContents"],
             style: const TextStyle(fontSize: 15, height: 1.5),
           ),
           const SizedBox(height: 15),
           Row(
             children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 10),
-                child: Text(
-                  "관심 ∙ ${widget.data["like"].toString()}",
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
+              // Padding(
+              //   padding: const EdgeInsets.only(right: 10),
+              //   child: Text(
+              //     "관심 ∙ ${widget.data["like"].toString()}",
+              //     style: const TextStyle(
+              //       fontSize: 12,
+              //       color: Colors.grey,
+              //     ),
+              //   ),
+              // ),
               Text(
-                "조회수 ∙ ${widget.data["board_hits"].toString()}",
+                "조회수 ∙ ${widget.data["boardHits"].toString()}",
                 style: const TextStyle(
                   fontSize: 12,
                   color: Colors.grey,
