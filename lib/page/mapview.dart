@@ -10,7 +10,7 @@ class MapView extends StatefulWidget {
   const MapView({Key? key}) : super(key: key);
 
   @override
-  _MapViewState createState() => _MapViewState();
+  State<MapView> createState() => _MapViewState();
 }
 
 class _MapViewState extends State<MapView> {
@@ -20,17 +20,40 @@ class _MapViewState extends State<MapView> {
   String? _locationText;
   final TextEditingController _textEditingController = TextEditingController();
 
+  final String _searchQuery = '';
+
+  Future<void> _getMyLocation() async {
+    final location = Location(); // create Location instance
+    LocationData?
+        currentLocation; // variable to hold the user's current location
+    try {
+      currentLocation =
+          await location.getLocation(); // get user's current location
+      setState(() {
+        // update state with new location information
+        _locationData = currentLocation;
+        _locationText =
+            "(${currentLocation?.latitude}, ${currentLocation?.longitude})";
+      });
+    } catch (e) {
+      print("Error: 주소를 받아오는데 실패했습니다.");
+    }
+  }
+
   void onMapCreated(NaverMapController controller) {
     if (_controller.isCompleted) _controller = Completer();
     _controller.complete(controller);
   }
 
   Future<void> _goToMyLocation() async {
-    final location = Location();
-    LocationData? currentLocation;
+    final location = Location(); // create Location instance
+    LocationData?
+        currentLocation; // variable to hold the user's current location
     try {
-      currentLocation = await location.getLocation();
+      currentLocation =
+          await location.getLocation(); // get user's current location
       setState(() {
+        // update state with new location information
         _locationData = currentLocation;
         _locationText =
             "(${currentLocation?.latitude}, ${currentLocation?.longitude})";
@@ -40,8 +63,11 @@ class _MapViewState extends State<MapView> {
     }
 
     if (currentLocation != null) {
-      final controller = await _controller.future;
+      // if the user's location was retrieved successfully
+      final controller =
+          await _controller.future; // wait for map controller to be available
       controller.moveCamera(
+        // move camera to user's location
         CameraUpdate.toCameraPosition(
           CameraPosition(
             target:
@@ -89,74 +115,100 @@ class _MapViewState extends State<MapView> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent, // 투명색
-      ),
-    );
-    return Scaffold(
-      appBar: AppBar(
-        title: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
-            color: Colors.white,
+  PreferredSizeWidget _appbarWidget() {
+    return AppBar(
+      title: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30),
+          color: Colors.white,
+        ),
+        child: TextFormField(
+          controller: _textEditingController,
+          decoration: const InputDecoration(
+            prefixIcon: Icon(Icons.search),
+            hintText: "주소를 입력하세요",
+            border: InputBorder.none,
           ),
-          child: TextFormField(
-            controller: _textEditingController,
-            decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.search),
-              hintText: "주소를 입력하세요",
-              border: InputBorder.none,
-            ),
-            onFieldSubmitted: (value) {
-              _goToAddress(value);
+          onFieldSubmitted: (value) {
+            _goToAddress(value);
+          },
+        ),
+      ),
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+    );
+  }
+
+  Widget _bodyWidget() {
+    final initialCameraPosition = _locationData != null
+        ? CameraPosition(
+            target: LatLng(_locationData!.latitude!, _locationData!.longitude!),
+            zoom: 15,
+          )
+        : const CameraPosition(
+            target: LatLng(37.5666102, 126.9783881),
+            zoom: 15,
+          );
+    return Stack(
+      children: [
+        NaverMap(
+          mapType: _mapType,
+          onMapCreated: onMapCreated,
+          initialCameraPosition: initialCameraPosition,
+        ),
+        Positioned(
+          bottom: 20,
+          right: 20,
+          child: FloatingActionButton(
+            onPressed: () {
+              _goToMyLocation();
             },
+            child: const Icon(Icons.my_location),
           ),
         ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      extendBodyBehindAppBar: true,
-      body: Stack(
-        children: [
-          NaverMap(
-            mapType: _mapType,
-            onMapCreated: onMapCreated,
-            initialCameraPosition: const CameraPosition(
-              target: LatLng(37.5666102, 126.9783881),
-              zoom: 15,
-            ),
-          ),
+        if (_locationData != null)
           Positioned(
-            bottom: 20,
-            right: 20,
-            child: FloatingActionButton(
-              onPressed: _goToMyLocation,
-              child: const Icon(Icons.my_location),
-            ),
-          ),
-          if (_locationData != null)
-            Positioned(
-              bottom: 80,
-              left: 20,
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
-                  color: Colors.white,
-                ),
-                child: Text(
-                  _locationText!,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
+            bottom: 80,
+            left: 20,
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+                color: Colors.white,
+              ),
+              child: Text(
+                _locationText!,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-        ],
-      ),
+          ),
+        Positioned(
+          bottom: 20,
+          child: Container(
+            child: TextButton(
+              style: const ButtonStyle(),
+              onPressed: () {
+                print(_locationText);
+              },
+              child: const Text("test"),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+        const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+    //_getMyLocation();
+    return Scaffold(
+      appBar: _appbarWidget(),
+      extendBodyBehindAppBar: true,
+      body: _bodyWidget(),
     );
   }
 }

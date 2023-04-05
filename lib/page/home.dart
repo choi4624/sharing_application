@@ -281,12 +281,13 @@ class _HomeState extends State<Home> {
       home: Scaffold(
         appBar: _appbarWidget(),
         body: RefreshIndicator(
-            onRefresh: () async {
-              setState(() {
-                _bodyWidget();
-              });
-            },
-            child: _bodyWidget()),
+          onRefresh: () async {
+            setState(() {
+              _bodyWidget();
+            });
+          },
+          child: _bodyWidget(),
+        ),
       ),
     );
   }
