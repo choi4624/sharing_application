@@ -1,7 +1,8 @@
-import 'package:dio/dio.dart';
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:html_editor_enhanced/html_editor.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:kpostal/kpostal.dart';
 import 'package:test_project/page/control.dart';
@@ -15,24 +16,26 @@ class Write extends StatefulWidget {
 }
 
 class _WriteState extends State<Write> {
-  // 사용자에게 입력받은 데이터를 저장할 변수
+  // textfield에서 입력받은 정보를 저장할 변수
   late String userId;
   late String userNickName;
-  //late List<String> imageList = [];
-  //late List<XFile> image;
   late String title;
   final TextEditingController _titleController = TextEditingController();
-  late dynamic contents;
-  final HtmlEditorController _contentsController = HtmlEditorController();
-  //final TextEditingController _contentsController = TextEditingController();
+  late String contents;
+  final TextEditingController _contentsController = TextEditingController();
   late String location;
   final TextEditingController _locationController = TextEditingController();
-  late String transaction; // 거래방식
-  late String category; // 물품 카테고리
-  late int price; // int 변환 필요
+  late String transaction; //
+  late String category; //
+  late int price;
   final TextEditingController _priceController = TextEditingController();
-
-  var userImage;
+  final picker = ImagePicker();
+  // 다수의 이미지 저장용
+  late List<XFile> image;
+  // 하나의 이미지 저장용
+  File? _imageFile;
+  // ignore: unused_field
+  late String _uploadedImageUrl;
 
   String categoryCurrentLocation = "default";
   String transactionCurrentLocation = "default";
@@ -54,7 +57,7 @@ class _WriteState extends State<Write> {
     "rental": "대여",
   };
 
-  // 사용자의 image를 받기위한 생성자
+  // 사용자의 다수의 image를 받기위한 생성자
   // final ImagePicker _picker = ImagePicker();
   // final List<XFile> _selectedFiles = [];
   // Future<void> _selectImages() async {
@@ -73,14 +76,25 @@ class _WriteState extends State<Write> {
   //   }
   //   print("Image List length: ${_selectedFiles.length.toString()}");
   // }
+  // 사용자의 다수의 image를 받기위한 생성자
 
-  // 사용자에게 입력받은 데이터를 변수에 저장하는 함수
+  Future _selectImage() async {
+    // ignore: deprecated_member_use
+    final pickedFile = await picker.getImage(
+      source: ImageSource.gallery,
+    );
+    setState(() {
+      _imageFile = File(pickedFile!.path);
+    });
+  }
+
+  // textfield에서 입력받은 데이터를 변수에 저장하는 함수
   void _saveData() {
     userId = UserInfo().userId;
     userNickName = UserInfo().userNickName;
     //image = _selectedFiles;
     title = _titleController.text;
-    contents = _contentsController;
+    contents = _contentsController.text;
     category = categoryCurrentLocation;
     transaction = transactionCurrentLocation;
     location = _locationController.text;
@@ -91,30 +105,33 @@ class _WriteState extends State<Write> {
   Future sendDataToServer({
     required String userId,
     required String userNickName,
-    required List<XFile> image,
+    required File imageFile,
     required String title,
-    required dynamic contents,
+    required String contents,
     required String category,
     required String location,
     required int price,
   }) async {
-    try {
-      final response = await Dio().post(
-        'https://example.com/endpoint', //post할 주소로 변경 필욘
-        data: {
-          'id': userId,
-          'boardWriter': userNickName,
-          //'image': image,
-          'boardTitle': title,
-          'boardContents': contents,
-          'category': category,
-          'location': location,
-          'price': price,
-        },
-      );
-      print(response.data);
-    } catch (e) {
-      throw Exception('Failed to send data to server');
+    final uri = Uri.parse('https://ubuntu.i4624.tk/example/upload');
+    final request = http.MultipartRequest('POST', uri);
+    request.files
+        .add(await http.MultipartFile.fromPath('filename', imageFile.path));
+    request.fields['userId'] = userId;
+    request.fields['userNickName'] = userNickName;
+    request.fields['title'] = title;
+    request.fields['contents'] = contents;
+    request.fields['category'] = category;
+    request.fields['location'] = location;
+    request.fields['price'] = price.toString();
+    final response = await request.send();
+    if (response.statusCode == 200) {
+      final responseBody = await response.stream.bytesToString();
+      final jsonResponse = json.decode(responseBody);
+      setState(() {
+        _uploadedImageUrl = jsonResponse['imageUrl'];
+      });
+    } else {
+      print(response.reasonPhrase);
     }
   }
 
@@ -130,6 +147,7 @@ class _WriteState extends State<Write> {
             color: Colors.black,
             padding: EdgeInsets.zero,
             onPressed: () {
+              //initState();
               Navigator.pop(context);
               Navigator.push(
                 context,
@@ -389,7 +407,7 @@ class _WriteState extends State<Write> {
                 );
               }
               // 내용 정보가 비어있을 때
-              else if (_contentsController.toString().isEmpty) {
+              else if (_contentsController.text.isEmpty) {
                 showDialog(
                   context: context,
                   barrierDismissible: false,
@@ -423,16 +441,53 @@ class _WriteState extends State<Write> {
                     );
                   },
                 );
+              } else if (_imageFile == null) {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      contentPadding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0)),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: const [
+                          Text(
+                            "사진을 첨부해주세요",
+                          ),
+                        ],
+                      ),
+                      actions: <Widget>[
+                        Center(
+                          child: SizedBox(
+                            width: 250,
+                            child: ElevatedButton(
+                              child: const Text("확인"),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                );
               }
               // 모든 정보가 입력되었을 때
               else {
                 _saveData();
+                /*
+                print(image);
                 print(title);
                 print(contents);
                 print(location);
                 print(category);
                 print(transaction);
                 print(price);
+                */
                 Navigator.pop(context);
                 Navigator.push(
                   context,
@@ -442,10 +497,7 @@ class _WriteState extends State<Write> {
             },
             child: const Text(
               "완료",
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
             ),
           ),
         ],
@@ -460,13 +512,11 @@ class _WriteState extends State<Write> {
   }
 
   Widget _makeTextArea() {
-    return ListView.builder(
+    return ListView.separated(
       itemBuilder: (BuildContext context, index) {
-        double h = MediaQuery.of(context).size.height;
-        double pTop = MediaQuery.of(context).padding.top;
         return Column(
           children: [
-            // Category SelectBox
+            // Category textfield
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -534,66 +584,64 @@ class _WriteState extends State<Write> {
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 20, 20, 10),
-                  child: Container(
-                    child: GestureDetector(
-                      onTap: () {
-                        print("click event");
-                        //ContentsRepository().fetchBoardList();
+                  child: GestureDetector(
+                    onTap: () {
+                      print("click event");
+                      //ContentsRepository().fetchBoardList();
+                    },
+                    child: PopupMenuButton<String>(
+                      offset: const Offset(0, 30),
+                      shape: ShapeBorder.lerp(
+                          RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0)),
+                          RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0)),
+                          1),
+                      onSelected: (String value) {
+                        setState(() {
+                          categoryCurrentLocation = value;
+                        });
                       },
-                      child: PopupMenuButton<String>(
-                        offset: const Offset(0, 30),
-                        shape: ShapeBorder.lerp(
-                            RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0)),
-                            RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0)),
-                            1),
-                        onSelected: (String value) {
-                          setState(() {
-                            categoryCurrentLocation = value;
-                          });
-                        },
-                        itemBuilder: (BuildContext context) {
-                          return [
-                            const PopupMenuItem(
-                              value: "electronics",
-                              child: Text("디지털/가전"),
-                            ),
-                            const PopupMenuItem(
-                              value: "tools",
-                              child: Text("공구"),
-                            ),
-                            const PopupMenuItem(
-                              value: "clothes",
-                              child: Text("의류"),
-                            ),
-                            const PopupMenuItem(
-                              value: "others",
-                              child: Text("기타"),
-                            ),
-                          ];
-                        },
-                        //좌측 상단 판매, 구매, 대여 선택바
-                        child: SizedBox(
-                          width: 100,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              //앱 내에서 좌측 상단바 출력을 위한 데이터
-                              Text(
-                                categoryOptionsTypeToString[
-                                    categoryCurrentLocation]!,
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const Icon(
-                                Icons.arrow_drop_down,
-                                color: Colors.black,
-                              ),
-                            ],
+                      itemBuilder: (BuildContext context) {
+                        return [
+                          const PopupMenuItem(
+                            value: "electronics",
+                            child: Text("디지털/가전"),
                           ),
+                          const PopupMenuItem(
+                            value: "tools",
+                            child: Text("공구"),
+                          ),
+                          const PopupMenuItem(
+                            value: "clothes",
+                            child: Text("의류"),
+                          ),
+                          const PopupMenuItem(
+                            value: "others",
+                            child: Text("기타"),
+                          ),
+                        ];
+                      },
+                      //좌측 상단 판매, 구매, 대여 선택바
+                      child: SizedBox(
+                        width: 100,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            //앱 내에서 좌측 상단바 출력을 위한 데이터
+                            Text(
+                              categoryOptionsTypeToString[
+                                  categoryCurrentLocation]!,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const Icon(
+                              Icons.arrow_drop_down,
+                              color: Colors.black,
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -688,76 +736,56 @@ class _WriteState extends State<Write> {
                 },
               ),
             ),
-            // Content html editor
+            // Content textfield
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-              child: HtmlEditor(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+              child: TextField(
                 controller: _contentsController,
-                htmlEditorOptions: const HtmlEditorOptions(
-                  hint: '내용을 입력해주세요',
-                  shouldEnsureVisible: false,
-                  autoAdjustHeight: true,
+                keyboardType: TextInputType.multiline,
+                decoration: const InputDecoration(
+                  enabledBorder: UnderlineInputBorder(),
+                  hintText: "내용을 입력해주세요",
                 ),
-                htmlToolbarOptions: const HtmlToolbarOptions(
-                  defaultToolbarButtons: [
-                    ListButtons(listStyles: false),
-                    InsertButtons(
-                      picture: true,
-                      audio: false,
-                      video: false,
-                      otherFile: false,
-                      table: false,
-                      hr: false,
-                    ),
-                  ],
-                ),
-                otherOptions: OtherOptions(
-                  height: h / 1.5,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      style: BorderStyle.none,
-                      color: Colors.black,
-                      width: 0,
-                    ),
-                  ),
-                ),
-                callbacks: Callbacks(
-                  onImageUpload: (imageInfo) {
-                    // 업로드된 이미지에 대한 처리
-                  },
-                ),
+                maxLength: 1000,
+                maxLines: 10,
+                textInputAction: TextInputAction.done,
               ),
             ),
             // image viewer
-            // SizedBox(
-            //   child: Wrap(
-            //     spacing: 8.0,
-            //     children: _selectedFiles
-            //         .map((file) => Padding(
-            //               padding: const EdgeInsets.all(2.0),
-            //               child: Container(
-            //                 decoration: BoxDecoration(
-            //                   border: Border.all(
-            //                     color: const Color.fromARGB(255, 167, 167, 167),
-            //                   ),
-            //                 ),
-            //                 child: SizedBox(
-            //                   width: 100,
-            //                   height: 100,
-            //                   child: Image.file(
-            //                     File(file.path),
-            //                     fit: BoxFit.scaleDown,
-            //                   ),
-            //                 ),
-            //               ),
-            //             ))
-            //         .toList(),
-            //   ),
-            // ),
+            SizedBox(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(2.0),
+                  child: _imageFile != null
+                      ? Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.transparent,
+                            ),
+                          ),
+                          child: SizedBox(
+                            width: 150,
+                            height: 150,
+                            child: Image.file(
+                              File(_imageFile!.path),
+                              fit: BoxFit.scaleDown,
+                            ),
+                          ),
+                        )
+                      : Container(),
+                ),
+              ),
+            )
           ],
         );
       },
       itemCount: 1,
+      separatorBuilder: (BuildContext context, int index) {
+        return Container(
+          height: 1,
+          color: Colors.black.withOpacity(0.4),
+        );
+      },
     );
   }
 
@@ -766,21 +794,21 @@ class _WriteState extends State<Write> {
     return Scaffold(
       appBar: _appbarWidget(),
       body: _makeTextArea(),
-      // floatingActionButton: FloatingActionButton.extended(
-      //   onPressed: () {
-      //     print('이미지 추가');
-      //     _selectImages();
-      //   },
-      //   tooltip: 'Increment',
-      //   backgroundColor: const Color.fromARGB(255, 200, 200, 200),
-      //   label: const Text(
-      //     "이미지 추가",
-      //     style: TextStyle(
-      //       color: Colors.black,
-      //       fontWeight: FontWeight.w600,
-      //     ),
-      //   ),
-      // ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          print('이미지 추가');
+          _selectImage();
+        },
+        tooltip: 'Increment',
+        backgroundColor: const Color.fromARGB(255, 200, 200, 200),
+        label: const Text(
+          "이미지 추가",
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
     );
   }
 }

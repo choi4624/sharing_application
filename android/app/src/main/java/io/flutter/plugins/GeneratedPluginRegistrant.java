@@ -31,9 +31,9 @@ public final class GeneratedPluginRegistrant {
       Log.e(TAG, "Error registering plugin flutter_keyboard_visibility, com.jrai.flutter_keyboard_visibility.FlutterKeyboardVisibilityPlugin", e);
     }
     try {
-      flutterEngine.getPlugins().add(new map.naver.plugin.net.note11.naver_map_plugin.NaverMapPlugin());
+      flutterEngine.getPlugins().add(new dev.note11.flutter_naver_map.flutter_naver_map.FlutterNaverMapPlugin());
     } catch(Exception e) {
-      Log.e(TAG, "Error registering plugin flutter_naver_map, map.naver.plugin.net.note11.naver_map_plugin.NaverMapPlugin", e);
+      Log.e(TAG, "Error registering plugin flutter_naver_map, dev.note11.flutter_naver_map.flutter_naver_map.FlutterNaverMapPlugin", e);
     }
     try {
       flutterEngine.getPlugins().add(new io.flutter.plugins.flutter_plugin_android_lifecycle.FlutterAndroidLifecyclePlugin());
@@ -61,9 +61,14 @@ public final class GeneratedPluginRegistrant {
       Log.e(TAG, "Error registering plugin location, com.lyokone.location.LocationPlugin", e);
     }
     try {
-      flutterEngine.getPlugins().add(new map.naver.plugin.net.lbstech.naver_map_plugin.NaverMapPlugin());
+      flutterEngine.getPlugins().add(new io.flutter.plugins.pathprovider.PathProviderPlugin());
     } catch(Exception e) {
-      Log.e(TAG, "Error registering plugin naver_map_plugin, map.naver.plugin.net.lbstech.naver_map_plugin.NaverMapPlugin", e);
+      Log.e(TAG, "Error registering plugin path_provider_android, io.flutter.plugins.pathprovider.PathProviderPlugin", e);
+    }
+    try {
+      flutterEngine.getPlugins().add(new com.baseflow.permissionhandler.PermissionHandlerPlugin());
+    } catch(Exception e) {
+      Log.e(TAG, "Error registering plugin permission_handler_android, com.baseflow.permissionhandler.PermissionHandlerPlugin", e);
     }
     try {
       flutterEngine.getPlugins().add(new io.flutter.plugins.videoplayer.VideoPlayerPlugin());

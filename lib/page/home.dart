@@ -170,7 +170,7 @@ class _HomeState extends State<Home> {
                   borderRadius: const BorderRadius.all(
                     Radius.circular(10),
                   ),
-                  child: Image.network(
+                  child: Image.asset(
                     UserInfo().defaultImage, //datas[index]["image"],
                     width: 100,
                     height: 100,
@@ -281,13 +281,12 @@ class _HomeState extends State<Home> {
       home: Scaffold(
         appBar: _appbarWidget(),
         body: RefreshIndicator(
-          onRefresh: () async {
-            setState(() {
-              _bodyWidget();
-            });
-          },
-          child: _bodyWidget(),
-        ),
+            onRefresh: () async {
+              setState(() {
+                _bodyWidget();
+              });
+            },
+            child: _bodyWidget()),
       ),
     );
   }

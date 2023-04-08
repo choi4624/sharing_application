@@ -7,7 +7,8 @@ class UserInfo {
   late String userNickName = "user_1";
   late String password;
   late String address = "경기도 안양시 동안구";
-  var defaultImage = "https://ubuntu.i4624.tk/view/edit_1566023586912.jpg";
+  var defaultImage = "assets/images/ex1.png";
+  //var defaultImage = "https://ubuntu.i4624.tk/view/edit_1566023586912.jpg";
 }
 
 class ContentsRepository {

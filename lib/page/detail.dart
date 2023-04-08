@@ -150,7 +150,7 @@ class _DetailContentViewState extends State<DetailContentView>
   Widget _sellerSimpleInfo() {
     return Column(
       children: [
-        Image.network(
+        Image.asset(
           //widget.data["image"],
           UserInfo().defaultImage,
         ),

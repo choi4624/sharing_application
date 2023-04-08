@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:test_project/page/chat.dart';
+//import 'package:test_project/page/chat.dart';
+import 'package:test_project/page/image.dart';
 import 'package:test_project/page/home.dart';
 import 'package:test_project/page/mapview.dart';
 import 'package:test_project/page/user.dart';
