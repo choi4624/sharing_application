@@ -11,20 +11,21 @@ class MapView extends StatefulWidget {
 }
 
 class _MapViewState extends State<MapView> {
-  final TextEditingController _textEditingController = TextEditingController();
-  late EdgeInsets safeArea;
-  double drawerHeight = 0;
-
-  late NLatLng _initialPosition;
-  late NaverMapController _controller;
-  //late GeocodingPlatform _geocoding;
-
   @override
   void initState() {
     super.initState();
     _getCurrentLocation();
     //_geocoding = GeocodingPlatform.instance;
   }
+
+  final TextEditingController _textEditingController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
+  late EdgeInsets safeArea;
+  double drawerHeight = 0;
+
+  late NLatLng _initialPosition;
+  late NaverMapController _controller;
+  //late GeocodingPlatform _geocoding;
 
   @override
   void dispose() {
@@ -38,6 +39,42 @@ class _MapViewState extends State<MapView> {
       _initialPosition = NLatLng(position.latitude, position.longitude);
     });
   }
+
+  // Future<void> _goToAddress(String address) async {
+  //   const apiKey =
+  //       "6AWAOaVaaf3gncmk0OMxo6dGW7xBfco7Yf2ZfPTR"; // 여기에 발급받은 인증키를 입력하세요
+  //   final encodedAddress = Uri.encodeComponent(address);
+  //   final apiUrl =
+  //       "https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=$encodedAddress";
+  //   final headers = {
+  //     "X-NCP-APIGW-API-KEY-ID": apiKey,
+  //     "X-NCP-APIGW-API-KEY": apiKey
+  //   };
+
+  //   try {
+  //     final response = await http.get(Uri.parse(apiUrl), headers: headers);
+  //     final jsonResult = jsonDecode(response.body);
+  //     final addresses = jsonResult["addresses"];
+  //     final first = addresses[0];
+  //     final latitude = double.parse(first["y"]);
+  //     final longitude = double.parse(first["x"]);
+  //     final controller = await _controller.future;
+  //     controller.moveCamera(
+  //       NCameraUpdate.toCameraPosition(
+  //         CameraPosition(
+  //           target: LatLng(latitude, longitude),
+  //           zoom: 15,
+  //         ),
+  //       ),
+  //     );
+  //     setState(() {
+  //       _locationData = null;
+  //       _locationText = "($latitude, $longitude)";
+  //     });
+  //   } catch (e) {
+  //     print("Error: $e");
+  //   }
+  // }
 
   PreferredSizeWidget _appbarWidget() {
     return AppBar(

@@ -53,33 +53,6 @@ class _ChatState extends State<Chat> {
       elevation: 1,
       title: Row(
         children: [
-          // TextButton(
-          //   style: ButtonStyle(
-          //     minimumSize: MaterialStateProperty.all(Size.zero),
-          //     padding: MaterialStateProperty.all(EdgeInsets.zero),
-          //     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          //     overlayColor: MaterialStateColor.resolveWith(
-          //         (states) => Colors.transparent),
-          //     backgroundColor: MaterialStateColor.resolveWith(
-          //         (states) => Colors.transparent),
-          //     foregroundColor: MaterialStateColor.resolveWith((states) =>
-          //         states.contains(MaterialState.pressed)
-          //             ? Colors.blue
-          //             : Colors.black),
-          //   ),
-          //   onPressed: () {
-          //     //_selectImages();
-          //     // _convert();
-          //     print("save ok");
-          //   },
-          //   child: const Text(
-          //     "저장",
-          //     style: TextStyle(
-          //       fontSize: 15,
-          //       fontWeight: FontWeight.w600,
-          //     ),
-          //   ),
-          // ),
           TextButton(
             style: ButtonStyle(
               minimumSize: MaterialStateProperty.all(Size.zero),

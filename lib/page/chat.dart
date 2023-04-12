@@ -12,7 +12,7 @@ class Chat extends StatefulWidget {
 }
 
 class _ChatState extends State<Chat> {
-  late File _imageFile;
+  File? _imageFile;
   // ignore: unused_field
   late String _uploadedImageUrl;
 
@@ -32,7 +32,7 @@ class _ChatState extends State<Chat> {
   Future uploadImage() async {
     final uri = Uri.parse('https://ubuntu.i4624.tk/image/upload');
     final formData = FormData.fromMap({
-      'filename': await MultipartFile.fromFile(_imageFile.path),
+      'filename': await MultipartFile.fromFile(_imageFile!.path),
     });
     try {
       final response = await Dio().postUri(uri, data: formData);
@@ -92,21 +92,23 @@ class _ChatState extends State<Chat> {
       body: SizedBox(
         child: Padding(
           padding: const EdgeInsets.all(2.0),
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: const Color.fromARGB(255, 167, 167, 167),
-              ),
-            ),
-            child: SizedBox(
-              width: 100,
-              height: 100,
-              child: Image.file(
-                File(_imageFile.path),
-                fit: BoxFit.scaleDown,
-              ),
-            ),
-          ),
+          child: _imageFile != null
+              ? Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.transparent,
+                    ),
+                  ),
+                  child: SizedBox(
+                    width: 500,
+                    height: 500,
+                    child: Image.file(
+                      File(_imageFile!.path),
+                      fit: BoxFit.scaleDown,
+                    ),
+                  ),
+                )
+              : Container(),
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(

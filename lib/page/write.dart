@@ -58,35 +58,35 @@ class _WriteState extends State<Write> {
   };
 
   // 사용자의 다수의 image를 받기위한 생성자
-  // final ImagePicker _picker = ImagePicker();
-  // final List<XFile> _selectedFiles = [];
-  // Future<void> _selectImages() async {
-  //   try {
-  //     final List<XFile> selectedImages = await _picker.pickMultiImage(
-  //         maxWidth: 640, maxHeight: 280, imageQuality: 100);
-  //     setState(() {
-  //       if (selectedImages.isNotEmpty) {
-  //         _selectedFiles.addAll(selectedImages);
-  //       } else {
-  //         print('no image select');
-  //       }
-  //     });
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  //   print("Image List length: ${_selectedFiles.length.toString()}");
-  // }
-  // 사용자의 다수의 image를 받기위한 생성자
-
-  Future _selectImage() async {
-    // ignore: deprecated_member_use
-    final pickedFile = await picker.getImage(
-      source: ImageSource.gallery,
-    );
-    setState(() {
-      _imageFile = File(pickedFile!.path);
-    });
+  final ImagePicker _picker = ImagePicker();
+  final List<XFile> _selectedFiles = [];
+  Future<void> _selectImages() async {
+    try {
+      final List<XFile> selectedImages = await _picker.pickMultiImage(
+        imageQuality: 100,
+      );
+      setState(() {
+        if (selectedImages.isNotEmpty) {
+          _selectedFiles.addAll(selectedImages);
+        } else {
+          print('no image select');
+        }
+      });
+    } catch (e) {
+      print(e);
+    }
+    print("Image List length: ${_selectedFiles.length.toString()}");
   }
+
+  // Future _selectImage() async {
+  //   // ignore: deprecated_member_use
+  //   final pickedFile = await picker.getImage(
+  //     source: ImageSource.gallery,
+  //   );
+  //   setState(() {
+  //     _imageFile = File(pickedFile!.path);
+  //   });
+  // }
 
   // textfield에서 입력받은 데이터를 변수에 저장하는 함수
   void _saveData() {
@@ -105,7 +105,7 @@ class _WriteState extends State<Write> {
   Future sendDataToServer({
     required String userId,
     required String userNickName,
-    required File imageFile,
+    required List<XFile> selectedFiles,
     required String title,
     required String contents,
     required String category,
@@ -114,8 +114,11 @@ class _WriteState extends State<Write> {
   }) async {
     final uri = Uri.parse('https://ubuntu.i4624.tk/example/upload');
     final request = http.MultipartRequest('POST', uri);
-    request.files
-        .add(await http.MultipartFile.fromPath('filename', imageFile.path));
+    for (var selectedFile in selectedFiles) {
+      request.files.add(
+        await http.MultipartFile.fromPath('filename', selectedFile.path),
+      );
+    }
     request.fields['userId'] = userId;
     request.fields['userNickName'] = userNickName;
     request.fields['title'] = title;
@@ -479,15 +482,6 @@ class _WriteState extends State<Write> {
               // 모든 정보가 입력되었을 때
               else {
                 _saveData();
-                /*
-                print(image);
-                print(title);
-                print(contents);
-                print(location);
-                print(category);
-                print(transaction);
-                print(price);
-                */
                 Navigator.pop(context);
                 Navigator.push(
                   context,
@@ -753,29 +747,55 @@ class _WriteState extends State<Write> {
             ),
             // image viewer
             SizedBox(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(2.0),
-                  child: _imageFile != null
-                      ? Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.transparent,
+              child: Wrap(
+                spacing: 8.0,
+                children: _selectedFiles
+                    .map((file) => Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: const Color.fromARGB(255, 167, 167, 167),
+                              ),
+                            ),
+                            child: SizedBox(
+                              width: 100,
+                              height: 100,
+                              child: Image.file(
+                                File(file.path),
+                                fit: BoxFit.scaleDown,
+                              ),
                             ),
                           ),
-                          child: SizedBox(
-                            width: 150,
-                            height: 150,
-                            child: Image.file(
-                              File(_imageFile!.path),
-                              fit: BoxFit.scaleDown,
-                            ),
-                          ),
-                        )
-                      : Container(),
-                ),
+                        ))
+                    .toList(),
               ),
-            )
+            ),
+            //Single image
+            //   SizedBox(
+            //     child: Center(
+            //       child: Padding(
+            //         padding: const EdgeInsets.all(2.0),
+            //         child: _imageFile != null
+            //             ? Container(
+            //                 decoration: BoxDecoration(
+            //                   border: Border.all(
+            //                     color: Colors.transparent,
+            //                   ),
+            //                 ),
+            //                 child: SizedBox(
+            //                   width: 150,
+            //                   height: 150,
+            //                   child: Image.file(
+            //                     File(_imageFile!.path),
+            //                     fit: BoxFit.scaleDown,
+            //                   ),
+            //                 ),
+            //               )
+            //             : Container(),
+            //       ),
+            //     ),
+            //   )
           ],
         );
       },
@@ -797,7 +817,8 @@ class _WriteState extends State<Write> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           print('이미지 추가');
-          _selectImage();
+          _selectImages();
+          //_selectImage();
         },
         tooltip: 'Increment',
         backgroundColor: const Color.fromARGB(255, 200, 200, 200),

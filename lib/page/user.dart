@@ -1,5 +1,8 @@
+import 'dart:convert';
+import 'dart:io';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:image_picker/image_picker.dart';
 
 class User extends StatefulWidget {
   const User({super.key});
@@ -9,163 +12,155 @@ class User extends StatefulWidget {
 }
 
 class _UserState extends State<User> {
+  // 다수의 이미지 저장용
+  late List<XFile> image;
+  // ignore: unused_field
+  late String _uploadedImageUrl;
+  final ImagePicker _picker = ImagePicker();
+  final List<XFile> _selectedFiles = [];
+  final picker = ImagePicker();
+
+  Future<void> _selectImages() async {
+    try {
+      final List<XFile> selectedImages = await _picker.pickMultiImage(
+        imageQuality: 100,
+      );
+      setState(() {
+        if (selectedImages.isNotEmpty) {
+          _selectedFiles.addAll(selectedImages);
+        } else {
+          print('no image select');
+        }
+      });
+    } catch (e) {
+      print(e);
+    }
+    print("Image List length: ${_selectedFiles.length.toString()}");
+  }
+
+  // Dio
+  // Future _uploadImage() async {
+  //   final uri = Uri.parse('https://ubuntu.i4624.tk/image/upload');
+  //   final formData = FormData.fromMap({
+  //     'filename': await MultipartFile.fromFile(_imageFile!.path),
+  //   });
+  //   try {
+  //     final response = await Dio().postUri(uri, data: formData);
+  //     if (response.statusCode == 200) {
+  //       setState(() {
+  //         _uploadedImageUrl = response.data['imageUrl'];
+  //       });
+  //     } else {
+  //       print(response.statusMessage);
+  //     }
+  //   } on DioError catch (e) {
+  //     print(e.message);
+  //   }
+  // }
+
+  Future _sendDataToServer({
+    required List<XFile> selectedFiles,
+  }) async {
+    final uri = Uri.parse('https://ubuntu.i4624.tk/image/upload');
+    final request = http.MultipartRequest('POST', uri);
+    for (var selectedFile in selectedFiles) {
+      request.files.add(
+        await http.MultipartFile.fromPath('filename', selectedFile.path),
+      );
+    }
+    final response = await request.send();
+    if (response.statusCode == 200) {
+      final responseBody = await response.stream.bytesToString();
+      final jsonResponse = json.decode(responseBody);
+      setState(() {
+        _uploadedImageUrl = jsonResponse['imageUrl'];
+      });
+    } else {
+      print(response.reasonPhrase);
+    }
+  }
+
+  PreferredSizeWidget _appbarWidget() {
+    return AppBar(
+      backgroundColor: Colors.white,
+      elevation: 1,
+      title: Row(
+        children: [
+          TextButton(
+            style: ButtonStyle(
+              minimumSize: MaterialStateProperty.all(Size.zero),
+              padding: MaterialStateProperty.all(EdgeInsets.zero),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              overlayColor: MaterialStateColor.resolveWith(
+                  (states) => Colors.transparent),
+              backgroundColor: MaterialStateColor.resolveWith(
+                  (states) => Colors.transparent),
+              foregroundColor: MaterialStateColor.resolveWith((states) =>
+                  states.contains(MaterialState.pressed)
+                      ? Colors.blue
+                      : Colors.black),
+            ),
+            onPressed: () {
+              print("이미지 업로드");
+              _sendDataToServer(selectedFiles: _selectedFiles);
+            },
+            child: const Text(
+              "보내기",
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-      ),
-      body: Container(
-        padding: const EdgeInsets.only(left: 16, top: 25, right: 16),
-        child: ListView(
-          children: [
-            const Text(
-              "설정",
-              style: TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(
-              height: 40,
-            ),
-            Row(
-              children: const [
-                Icon(
-                  Icons.person,
-                  color: Colors.green,
-                ),
-                SizedBox(
-                  width: 8,
-                ),
-                Text(
-                  "계정",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            const Divider(
-              height: 15,
-              thickness: 2,
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            buildAccountOptionRow(context, "비밀번호 변경"),
-            buildAccountOptionRow(context, "연락처 변경"),
-            buildAccountOptionRow(context, "SNS 연결"),
-            buildAccountOptionRow(context, "개인 정보 보호 및 보안"),
-            const SizedBox(
-              height: 40,
-            ),
-            Row(
-              children: const [
-                Icon(
-                  Icons.volume_up_outlined,
-                  color: Colors.green,
-                ),
-                SizedBox(
-                  width: 8,
-                ),
-                Text(
-                  "알림",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            const Divider(
-              height: 15,
-              thickness: 2,
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            buildNotificationOptionRow("관심 상품 알림", true),
-            buildNotificationOptionRow("계정 활동", true),
-            const SizedBox(
-              height: 50,
-            ),
-            Center(
-              child: OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 40),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)),
-                ),
-                onPressed: () {},
-                child: const Text("로그아웃",
-                    style: TextStyle(
-                        fontSize: 16, letterSpacing: 2.2, color: Colors.black)),
-              ),
-            )
-          ],
+      appBar: _appbarWidget(),
+      body: Center(
+        child: SizedBox(
+          child: Wrap(
+            spacing: 8.0,
+            children: _selectedFiles
+                .map((file) => Padding(
+                      padding: const EdgeInsets.all(2.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: const Color.fromARGB(255, 167, 167, 167),
+                          ),
+                        ),
+                        child: SizedBox(
+                          width: 100,
+                          height: 100,
+                          child: Image.file(
+                            File(file.path),
+                            fit: BoxFit.scaleDown,
+                          ),
+                        ),
+                      ),
+                    ))
+                .toList(),
+          ),
         ),
       ),
-    );
-  }
-
-  Row buildNotificationOptionRow(String title, bool isActive) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          title,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          print('이미지 추가');
+          _selectImages();
+        },
+        tooltip: 'Increment',
+        backgroundColor: const Color.fromARGB(255, 200, 200, 200),
+        label: const Text(
+          "이미지 추가",
           style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey[600]),
-        ),
-        Transform.scale(
-            scale: 0.7,
-            child: CupertinoSwitch(
-              value: isActive,
-              onChanged: (bool val) {},
-            ))
-      ],
-    );
-  }
-
-  GestureDetector buildAccountOptionRow(BuildContext context, String title) {
-    return GestureDetector(
-      onTap: () {
-        showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text(title),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Text("옵션 1"),
-                    Text("옵션 2"),
-                    Text("옵션 3"),
-                  ],
-                ),
-                actions: [
-                  TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text("닫기")),
-                ],
-              );
-            });
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[600],
-              ),
-            ),
-            const Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.grey,
-            ),
-          ],
+            color: Colors.black,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );

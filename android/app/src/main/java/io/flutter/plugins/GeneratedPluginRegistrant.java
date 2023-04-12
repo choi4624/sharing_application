@@ -61,6 +61,11 @@ public final class GeneratedPluginRegistrant {
       Log.e(TAG, "Error registering plugin location, com.lyokone.location.LocationPlugin", e);
     }
     try {
+      flutterEngine.getPlugins().add(new map.naver.plugin.net.lbstech.naver_map_plugin.NaverMapPlugin());
+    } catch(Exception e) {
+      Log.e(TAG, "Error registering plugin naver_map_plugin, map.naver.plugin.net.lbstech.naver_map_plugin.NaverMapPlugin", e);
+    }
+    try {
       flutterEngine.getPlugins().add(new io.flutter.plugins.pathprovider.PathProviderPlugin());
     } catch(Exception e) {
       Log.e(TAG, "Error registering plugin path_provider_android, io.flutter.plugins.pathprovider.PathProviderPlugin", e);
