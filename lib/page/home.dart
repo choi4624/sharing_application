@@ -170,10 +170,11 @@ class _HomeState extends State<Home> {
                   borderRadius: const BorderRadius.all(
                     Radius.circular(10),
                   ),
-                  child: Image.asset(
-                    UserInfo().defaultImage, //datas[index]["image"],
+                  child: Image.network(
+                    datas[index]["image"][0],
                     width: 100,
                     height: 100,
+                    scale: 0.1,
                     fit: BoxFit.cover,
                   ),
                 ),

@@ -1,14 +1,16 @@
-# ST_Share_UI
+# flutter_application_1
 
-UI 및 프론트엔드 작업
+A new Flutter project.
 
-## 구현 완료 기능
-- 게시판 출력
-- 사용자의 게시글 작성 페이지 및 업로드 기능
-- Naver Map Api를 이용한 지도 출력
+## Getting Started
 
-## 구현 및 수정이 필요한 기능
-- 로그인 
-- 게시글 검색 기능
-- 게시글 및 세부 상품 페이지 이미지 로딩 속도 향상
-- 지도 마커 표시 기능
+This project is a starting point for a Flutter application.
+
+A few resources to get you started if this is your first Flutter project:
+
+- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.

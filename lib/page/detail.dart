@@ -24,7 +24,11 @@ class _DetailContentViewState extends State<DetailContentView>
   late AnimationController _animationController;
   late Animation _colorTween;
 
-  void addList() {}
+  // void addList() {
+  //   for (imgList in widget.data["image"]) {
+  //     imgList = widget.data["image"];
+  //   }
+  // }
 
   @override
   void initState() {
@@ -32,18 +36,7 @@ class _DetailContentViewState extends State<DetailContentView>
     _animationController = AnimationController(vsync: this);
     _colorTween = ColorTween(begin: Colors.white, end: Colors.black)
         .animate(_animationController);
-    imgList = [
-      UserInfo().defaultImage,
-      UserInfo().defaultImage,
-      UserInfo().defaultImage,
-      UserInfo().defaultImage,
-      UserInfo().defaultImage,
-      // widget.data["image"],
-      // widget.data["image"],
-      // widget.data["image"],
-      // widget.data["image"],
-      // widget.data["image"],
-    ];
+    imgList = widget.data["image"];
     _current = 0;
     // _loadMyFavoriteContentState();
     controller.addListener(() {
@@ -105,8 +98,8 @@ class _DetailContentViewState extends State<DetailContentView>
               options: CarouselOptions(
                   height: size.width * 0.8,
                   initialPage: 0,
-                  enableInfiniteScroll: false,
-                  viewportFraction: 1.0,
+                  enableInfiniteScroll: true,
+                  viewportFraction: 1,
                   enlargeCenterPage: false,
                   onPageChanged: (index, reason) {
                     setState(() {
@@ -117,8 +110,9 @@ class _DetailContentViewState extends State<DetailContentView>
                 return SizedBox(
                   width: size.width,
                   height: size.width,
-                  child: Image.asset(
-                    UserInfo().defaultImage,
+                  child: Image.network(
+                    widget.data["image"][_current],
+                    scale: 0.1,
                     fit: BoxFit.cover,
                   ),
                 );
@@ -140,8 +134,9 @@ class _DetailContentViewState extends State<DetailContentView>
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: _current == index
-                        ? Colors.white
-                        : Colors.white.withOpacity(0.4),
+                        ? Colors.black //Colors.white
+                        : Colors.grey
+                            .withOpacity(0.4), //Colors.white.withOpacity(0.4),
                   ),
                 );
               }).toList(),

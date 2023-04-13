@@ -1,7 +1,13 @@
+// ignore: unused_import
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:geolocator/geolocator.dart';
+// ignore: unused_import
+import 'package:http/http.dart' as http;
+import 'package:location/location.dart';
 
 class MapView extends StatefulWidget {
   const MapView({Key? key}) : super(key: key);
@@ -15,11 +21,18 @@ class _MapViewState extends State<MapView> {
   void initState() {
     super.initState();
     _getCurrentLocation();
-    //_geocoding = GeocodingPlatform.instance;
+    _initMap();
+  }
+
+  Future<void> _initMap() async {
+    await _getCurrentLocation();
+    setState(() {});
   }
 
   final TextEditingController _textEditingController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
+  LocationData? _locationData;
+  String? _locationText;
   late EdgeInsets safeArea;
   double drawerHeight = 0;
 
@@ -40,41 +53,40 @@ class _MapViewState extends State<MapView> {
     });
   }
 
-  // Future<void> _goToAddress(String address) async {
-  //   const apiKey =
-  //       "6AWAOaVaaf3gncmk0OMxo6dGW7xBfco7Yf2ZfPTR"; // 여기에 발급받은 인증키를 입력하세요
-  //   final encodedAddress = Uri.encodeComponent(address);
-  //   final apiUrl =
-  //       "https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=$encodedAddress";
-  //   final headers = {
-  //     "X-NCP-APIGW-API-KEY-ID": apiKey,
-  //     "X-NCP-APIGW-API-KEY": apiKey
-  //   };
+  Future<void> _goToAddress(String address) async {
+    const apiKey =
+        "6AWAOaVaaf3gncmk0OMxo6dGW7xBfco7Yf2ZfPTR"; // 여기에 발급받은 인증키를 입력하세요
+    final encodedAddress = Uri.encodeComponent(address);
+    final apiUrl =
+        "https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=$encodedAddress";
+    final headers = {
+      "X-NCP-APIGW-API-KEY-ID": apiKey,
+      "X-NCP-APIGW-API-KEY": apiKey
+    };
 
-  //   try {
-  //     final response = await http.get(Uri.parse(apiUrl), headers: headers);
-  //     final jsonResult = jsonDecode(response.body);
-  //     final addresses = jsonResult["addresses"];
-  //     final first = addresses[0];
-  //     final latitude = double.parse(first["y"]);
-  //     final longitude = double.parse(first["x"]);
-  //     final controller = await _controller.future;
-  //     controller.moveCamera(
-  //       NCameraUpdate.toCameraPosition(
-  //         CameraPosition(
-  //           target: LatLng(latitude, longitude),
-  //           zoom: 15,
-  //         ),
-  //       ),
-  //     );
-  //     setState(() {
-  //       _locationData = null;
-  //       _locationText = "($latitude, $longitude)";
-  //     });
-  //   } catch (e) {
-  //     print("Error: $e");
-  //   }
-  // }
+    try {
+      final response = await http.get(Uri.parse(apiUrl), headers: headers);
+      final jsonResult = jsonDecode(response.body);
+      final addresses = jsonResult["addresses"];
+      final first = addresses[0];
+      final latitude = double.parse(first["y"]);
+      final longitude = double.parse(first["x"]);
+      _controller.updateCamera(
+        NCameraUpdate.fromCameraPosition(
+          NCameraPosition(
+            target: NLatLng(latitude, longitude),
+            zoom: 15,
+          ),
+        ),
+      );
+      setState(() {
+        _locationData = null;
+        _locationText = "($latitude, $longitude)";
+      });
+    } catch (e) {
+      print("Error: $e");
+    }
+  }
 
   PreferredSizeWidget _appbarWidget() {
     return AppBar(
@@ -91,7 +103,7 @@ class _MapViewState extends State<MapView> {
             border: InputBorder.none,
           ),
           onFieldSubmitted: (value) {
-            //_goToAddress(value);
+            _goToAddress(value);
           },
         ),
       ),
