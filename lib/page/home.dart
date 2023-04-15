@@ -139,6 +139,11 @@ class _HomeState extends State<Home> {
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       itemBuilder: (BuildContext context, int index) {
+        if (datas[index]["image"].isEmpty) {
+          datas[index]["image"] = [
+            "https://png.pngtree.com/png-vector/20190820/ourlarge/pngtree-no-image-vector-illustration-isolated-png-image_1694547.jpg"
+          ];
+        }
         return GestureDetector(
           onTap: () {
             Navigator.push(
