@@ -61,7 +61,7 @@ class _UserState extends State<User> {
   Future _sendDataToServer({
     required List<XFile> selectedFiles,
   }) async {
-    final uri = Uri.parse('https://ubuntu.i4624.tk/image/upload');
+    final uri = Uri.parse('https://ubuntu.i4624.tk/example/upload');
     final request = http.MultipartRequest('POST', uri);
     for (var selectedFile in selectedFiles) {
       request.files.add(

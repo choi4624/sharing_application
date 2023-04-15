@@ -12,7 +12,7 @@ class Chat extends StatefulWidget {
 }
 
 class _ChatState extends State<Chat> {
-  File? _imageFile;
+  XFile? _imageFile;
   // ignore: unused_field
   late String _uploadedImageUrl;
 
@@ -24,7 +24,7 @@ class _ChatState extends State<Chat> {
       source: ImageSource.gallery,
     );
     setState(() {
-      _imageFile = File(pickedFile!.path);
+      _imageFile = XFile(pickedFile!.path);
     });
   }
 
@@ -90,25 +90,27 @@ class _ChatState extends State<Chat> {
     return Scaffold(
       appBar: _appbarWidget(),
       body: SizedBox(
-        child: Padding(
-          padding: const EdgeInsets.all(2.0),
-          child: _imageFile != null
-              ? Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.transparent,
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(2.0),
+            child: _imageFile != null
+                ? Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.transparent,
+                      ),
                     ),
-                  ),
-                  child: SizedBox(
-                    width: 500,
-                    height: 500,
-                    child: Image.file(
-                      File(_imageFile!.path),
-                      fit: BoxFit.scaleDown,
+                    child: SizedBox(
+                      width: 500,
+                      height: 500,
+                      child: Image.file(
+                        File(_imageFile!.path),
+                        fit: BoxFit.scaleDown,
+                      ),
                     ),
-                  ),
-                )
-              : Container(),
+                  )
+                : Container(),
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(

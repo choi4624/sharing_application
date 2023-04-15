@@ -18,7 +18,7 @@ class ContentsRepository {
       {
         "id": 14,
         "image": [
-          "https://greendroprecycling.com/wp-content/uploads/2017/04/GreenDrop_Station_Aluminum_Can_Pepsi-300x300.jpg",
+          "https://ubuntu.i4624.tk/image/imageid/100022",
           "https://greendroprecycling.com/wp-content/uploads/2017/04/GreenDrop_Station_Aluminum_Can_Coke-300x300.jpg",
           "https://www.tylenolprofessional.com/sites/tylenol_hcp_us/files/sample-display-image/tylenol-product-samples600x600.jpg",
         ],
@@ -134,7 +134,7 @@ class ContentsRepository {
       {
         "id": 15,
         "image": [
-          "https://greendroprecycling.com/wp-content/uploads/2017/04/GreenDrop_Station_Aluminum_Can_Pepsi-300x300.jpg",
+          //{imageSererURL}+"/"+"100022",
           "https://greendroprecycling.com/wp-content/uploads/2017/04/GreenDrop_Station_Aluminum_Can_Coke-300x300.jpg",
           "https://www.tylenolprofessional.com/sites/tylenol_hcp_us/files/sample-display-image/tylenol-product-samples600x600.jpg",
         ],
@@ -165,10 +165,11 @@ class ContentsRepository {
       }
     ],
   };
-
+  //String serverURL = "https://ubuntu.i4624.tk/image/imageid/";
   void jsonToData() {
     for (var i = 0; i < data.length; i++) {
       var item = data[i];
+      //datas[item['image']] = serverURL + item['image']; //image 는 imageuid값
       // category 값을 기준으로 Map에 저장합니다.
       if (datas[item['boardCategory']] == null) {
         datas[item['boardCategory']] = [item];

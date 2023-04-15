@@ -24,12 +24,6 @@ class _DetailContentViewState extends State<DetailContentView>
   late AnimationController _animationController;
   late Animation _colorTween;
 
-  // void addList() {
-  //   for (imgList in widget.data["image"]) {
-  //     imgList = widget.data["image"];
-  //   }
-  // }
-
   @override
   void initState() {
     super.initState();
@@ -112,6 +106,7 @@ class _DetailContentViewState extends State<DetailContentView>
                   height: size.width,
                   child: Image.network(
                     widget.data["image"][_current],
+                    width: double.infinity,
                     scale: 0.1,
                     fit: BoxFit.cover,
                   ),
@@ -250,37 +245,6 @@ class _DetailContentViewState extends State<DetailContentView>
           ],
         ),
       ),
-      // SliverPadding(
-      //   padding: const EdgeInsets.symmetric(horizontal: 15),
-      //   sliver: SliverGrid(
-      //     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-      //         crossAxisCount: 2, mainAxisSpacing: 10, crossAxisSpacing: 10),
-      //     delegate: SliverChildListDelegate(List.generate(20, (index) {
-      //       return Container(
-      //         child: Column(
-      //           crossAxisAlignment: CrossAxisAlignment.stretch,
-      //           children: [
-      //             ClipRRect(
-      //               borderRadius: BorderRadius.circular(10),
-      //               child: Container(
-      //                 color: Colors.grey.withOpacity(0.3),
-      //                 height: 120,
-      //               ),
-      //             ),
-      //             const Text(
-      //               "상품 제목",
-      //               style: TextStyle(fontSize: 14),
-      //             ),
-      //             const Text(
-      //               "금액",
-      //               style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-      //             ),
-      //           ],
-      //         ),
-      //       );
-      //     }).toList()),
-      //   ),
-      // ),
     ]);
   }
 
@@ -351,9 +315,10 @@ class _DetailContentViewState extends State<DetailContentView>
                   child: const Text(
                     "채팅으로 거래하기",
                     style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: 16),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ],

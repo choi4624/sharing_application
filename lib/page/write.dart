@@ -19,29 +19,35 @@ class _WriteState extends State<Write> {
   // textfield에서 입력받은 정보를 저장할 변수
   late String userId;
   late String userNickName;
+
   late String title;
   final TextEditingController _titleController = TextEditingController();
+
   late String contents;
   final TextEditingController _contentsController = TextEditingController();
+
   late String location;
   final TextEditingController _locationController = TextEditingController();
-  late String transaction; //
+
   late String category; //
+  late String productCategory; //
+
   late int price;
   final TextEditingController _priceController = TextEditingController();
-  final picker = ImagePicker();
-  // 다수의 이미지 저장용
-  late List<XFile> image;
-  // 하나의 이미지 저장용
-  File? _imageFile;
+
+  // 사용자의 이미지 저장하는 리스트
+  final List<XFile> _selectedFiles = [];
+  late String imageUid;
+  late String imageName;
+
   // ignore: unused_field
   late String _uploadedImageUrl;
 
+  String productCategoryCurrentLocation = "default";
   String categoryCurrentLocation = "default";
-  String transactionCurrentLocation = "default";
 
   // 카테고리 선택
-  final Map<String, dynamic> categoryOptionsTypeToString = {
+  final Map<String, dynamic> productCategoryOptionsTypeToString = {
     "default": "카테고리",
     "electronics": "디지털/가전",
     "tools": "공구",
@@ -50,16 +56,27 @@ class _WriteState extends State<Write> {
   };
 
   // 거래방식 선택
-  final Map<String, dynamic> transactionOptionsTypeToString = {
+  final Map<String, dynamic> categoryOptionsTypeToString = {
     "default": "거래방식",
     "sell": "판매",
     "buy": "구매",
     "rental": "대여",
   };
 
+  // textfield에서 입력받은 데이터를 변수에 저장하는 함수
+  void _saveData() {
+    userId = UserInfo().userId;
+    userNickName = UserInfo().userNickName;
+    title = _titleController.text;
+    contents = _contentsController.text; // 카테고리
+    productCategory = productCategoryCurrentLocation;
+    category = categoryCurrentLocation; //거래방식
+    location = _locationController.text;
+    price = int.parse(_priceController.text.replaceAll(',', ''));
+  }
+
   // 사용자의 다수의 image를 받기위한 생성자
   final ImagePicker _picker = ImagePicker();
-  final List<XFile> _selectedFiles = [];
   Future<void> _selectImages() async {
     try {
       final List<XFile> selectedImages = await _picker.pickMultiImage(
@@ -78,52 +95,80 @@ class _WriteState extends State<Write> {
     print("Image List length: ${_selectedFiles.length.toString()}");
   }
 
-  // Future _selectImage() async {
-  //   // ignore: deprecated_member_use
-  //   final pickedFile = await picker.getImage(
-  //     source: ImageSource.gallery,
-  //   );
-  //   setState(() {
-  //     _imageFile = File(pickedFile!.path);
-  //   });
-  // }
+  // 이미지를 서버에 전송
+  Future _uploadImagesToServer({
+    required List<XFile> selectedFiles,
+    //required String userId,
+  }) async {
+    final uri = Uri.parse('https://ubuntu.i4624.tk/image/upload');
+    final request = http.MultipartRequest('POST', uri);
+    for (var selectedFile in selectedFiles) {
+      request.files.add(
+        await http.MultipartFile.fromPath('filename', selectedFile.path),
+      );
+      //request.fields['userId'] = UserInfo().userId;
+    }
+    final response = await request.send();
+    if (response.statusCode == 200) {
+      final responseBody = await response.stream.bytesToString();
+      final jsonResponse = json.decode(responseBody);
+      setState(() {
+        _uploadedImageUrl = jsonResponse['imageUrl'];
+        print("이미지 전송");
+      });
+    } else {
+      throw Exception('Failed to send data');
+      //print(response.reasonPhrase);
+    }
+  }
 
-  // textfield에서 입력받은 데이터를 변수에 저장하는 함수
-  void _saveData() {
-    userId = UserInfo().userId;
-    userNickName = UserInfo().userNickName;
-    //image = _selectedFiles;
-    title = _titleController.text;
-    contents = _contentsController.text;
-    category = categoryCurrentLocation;
-    transaction = transactionCurrentLocation;
-    location = _locationController.text;
-    price = int.parse(_priceController.text.replaceAll(',', ''));
+  // imageuid를 get()방식을 통해 받기
+  List<dynamic> imageJsonData = [];
+  Future<List> _getImageIdData() async {
+    var url = Uri.parse('https://ubuntu.i4624.tk/image/sql/recent/i4624/2'
+        //'https://ubuntu.i4624.tk/image/sql/recent/${UserInfo().userId}/${_selectedFiles.length}'
+        );
+    var response = await http.get(url);
+    if (response.statusCode == 200) {
+      final List<dynamic> responseData =
+          jsonDecode(utf8.decode(response.bodyBytes));
+      imageJsonData = responseData;
+      return imageJsonData;
+    } else {
+      throw Exception('Failed to load data');
+    }
+  }
+
+  // imageUid JSON -> Data
+  List<Map<String, dynamic>> imageData = [];
+  List<Map<String, dynamic>> _convertImageData(List<dynamic> imageJsonData) {
+    return imageData = imageJsonData
+        .map<Map<String, dynamic>>((data) => {
+              'imageUid': data[0],
+              'imageName': data[1] as String,
+            })
+        .toList();
   }
 
   // Send Data To Server
-  Future sendDataToServer({
-    required String userId,
+  Future _sendDataToServer({
+    //required String userId,
+    required dynamic images,
     required String userNickName,
-    required List<XFile> selectedFiles,
     required String title,
     required String contents,
     required String category,
     required String location,
     required int price,
   }) async {
-    final uri = Uri.parse('https://ubuntu.i4624.tk/example/upload');
+    final uri = Uri.parse('https://ubuntu.i4624.tk/board/save');
     final request = http.MultipartRequest('POST', uri);
-    for (var selectedFile in selectedFiles) {
-      request.files.add(
-        await http.MultipartFile.fromPath('filename', selectedFile.path),
-      );
-    }
-    request.fields['userId'] = userId;
-    request.fields['userNickName'] = userNickName;
-    request.fields['title'] = title;
-    request.fields['contents'] = contents;
-    request.fields['category'] = category;
+    //request.fields['userId'] = userId;
+    request.fields['image'] = images as String; //imageuid -> 데이터를 받아와 imageuid를
+    request.fields['boardWriter'] = userNickName;
+    request.fields['boardTitle'] = title;
+    request.fields['boardContents'] = contents;
+    request.fields['boardCategory'] = category;
     request.fields['location'] = location;
     request.fields['price'] = price.toString();
     final response = await request.send();
@@ -132,9 +177,11 @@ class _WriteState extends State<Write> {
       final jsonResponse = json.decode(responseBody);
       setState(() {
         _uploadedImageUrl = jsonResponse['imageUrl'];
+        print("데이터 전송");
       });
     } else {
       print(response.reasonPhrase);
+      throw Exception('Failed to send data');
     }
   }
 
@@ -150,7 +197,6 @@ class _WriteState extends State<Write> {
             color: Colors.black,
             padding: EdgeInsets.zero,
             onPressed: () {
-              //initState();
               Navigator.pop(context);
               Navigator.push(
                 context,
@@ -194,7 +240,7 @@ class _WriteState extends State<Write> {
             ),
             onPressed: () {
               // 거래방식 정보가 비어있을 때
-              if (transactionCurrentLocation == "default") {
+              if (categoryCurrentLocation == "default") {
                 showDialog(
                   context: context,
                   barrierDismissible: false,
@@ -242,7 +288,7 @@ class _WriteState extends State<Write> {
                 );
               }
               // 카테고리 정보가 비어있을 때
-              else if (categoryCurrentLocation == "default") {
+              else if (productCategoryCurrentLocation == "default") {
                 showDialog(
                   context: context,
                   barrierDismissible: false,
@@ -444,44 +490,61 @@ class _WriteState extends State<Write> {
                     );
                   },
                 );
-              } else if (_imageFile == null) {
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      contentPadding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0)),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: const [
-                          Text(
-                            "사진을 첨부해주세요",
-                          ),
-                        ],
-                      ),
-                      actions: <Widget>[
-                        Center(
-                          child: SizedBox(
-                            width: 250,
-                            child: ElevatedButton(
-                              child: const Text("확인"),
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                );
               }
+              // else if (_imageFile == null) {
+              //   showDialog(
+              //     context: context,
+              //     barrierDismissible: false,
+              //     builder: (BuildContext context) {
+              //       return AlertDialog(
+              //         contentPadding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
+              //         shape: RoundedRectangleBorder(
+              //             borderRadius: BorderRadius.circular(10.0)),
+              //         content: Column(
+              //           mainAxisSize: MainAxisSize.min,
+              //           crossAxisAlignment: CrossAxisAlignment.center,
+              //           children: const [
+              //             Text(
+              //               "사진을 첨부해주세요",
+              //             ),
+              //           ],
+              //         ),
+              //         actions: <Widget>[
+              //           Center(
+              //             child: SizedBox(
+              //               width: 250,
+              //               child: ElevatedButton(
+              //                 child: const Text("확인"),
+              //                 onPressed: () {
+              //                   Navigator.pop(context);
+              //                 },
+              //               ),
+              //             ),
+              //           ),
+              //         ],
+              //       );
+              //     },
+              //   );
+              // }
               // 모든 정보가 입력되었을 때
               else {
+                _uploadImagesToServer(
+                  selectedFiles: _selectedFiles,
+                  //userId: UserInfo().userId,
+                );
+                _getImageIdData();
+                _convertImageData(imageJsonData);
                 _saveData();
+                _sendDataToServer(
+                  userNickName: UserInfo().userNickName,
+                  images: imageData, //have to modify
+                  title: title,
+                  contents: contents,
+                  category: category,
+                  location: location,
+                  price: price,
+                );
+                print("데이터 전송");
                 Navigator.pop(context);
                 Navigator.push(
                   context,
@@ -530,7 +593,7 @@ class _WriteState extends State<Write> {
                           1),
                       onSelected: (String value) {
                         setState(() {
-                          transactionCurrentLocation = value;
+                          categoryCurrentLocation = value;
                         });
                       },
                       itemBuilder: (BuildContext context) {
@@ -556,8 +619,8 @@ class _WriteState extends State<Write> {
                           children: [
                             //앱 내에서 좌측 상단바 출력을 위한 데이터
                             Text(
-                              transactionOptionsTypeToString[
-                                  transactionCurrentLocation]!,
+                              categoryOptionsTypeToString[
+                                  categoryCurrentLocation]!,
                               style: const TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.w600,
@@ -593,7 +656,7 @@ class _WriteState extends State<Write> {
                           1),
                       onSelected: (String value) {
                         setState(() {
-                          categoryCurrentLocation = value;
+                          productCategoryCurrentLocation = value;
                         });
                       },
                       itemBuilder: (BuildContext context) {
@@ -624,8 +687,8 @@ class _WriteState extends State<Write> {
                           children: [
                             //앱 내에서 좌측 상단바 출력을 위한 데이터
                             Text(
-                              categoryOptionsTypeToString[
-                                  categoryCurrentLocation]!,
+                              productCategoryOptionsTypeToString[
+                                  productCategoryCurrentLocation]!,
                               style: const TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.w600,
@@ -771,31 +834,6 @@ class _WriteState extends State<Write> {
                     .toList(),
               ),
             ),
-            //Single image
-            //   SizedBox(
-            //     child: Center(
-            //       child: Padding(
-            //         padding: const EdgeInsets.all(2.0),
-            //         child: _imageFile != null
-            //             ? Container(
-            //                 decoration: BoxDecoration(
-            //                   border: Border.all(
-            //                     color: Colors.transparent,
-            //                   ),
-            //                 ),
-            //                 child: SizedBox(
-            //                   width: 150,
-            //                   height: 150,
-            //                   child: Image.file(
-            //                     File(_imageFile!.path),
-            //                     fit: BoxFit.scaleDown,
-            //                   ),
-            //                 ),
-            //               )
-            //             : Container(),
-            //       ),
-            //     ),
-            //   )
           ],
         );
       },
