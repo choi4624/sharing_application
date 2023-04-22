@@ -3,12 +3,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class UserInfo {
-  late String userId = "01";
-  late String userNickName = "user_1";
+  late String userId = "testUser_1";
+  late String userNickName = "userA";
   late String password;
   late String address = "경기도 안양시 동안구";
-  var defaultImage = "assets/images/ex1.png";
-  //var defaultImage = "https://ubuntu.i4624.tk/view/edit_1566023586912.jpg";
 }
 
 class ContentsRepository {
@@ -169,7 +167,7 @@ class ContentsRepository {
   void jsonToData() {
     for (var i = 0; i < data.length; i++) {
       var item = data[i];
-      //datas[item['image']] = serverURL + item['image']; //image 는 imageuid값
+      //datas[item['image']] = serverURL + item['image'];
       // category 값을 기준으로 Map에 저장합니다.
       if (datas[item['boardCategory']] == null) {
         datas[item['boardCategory']] = [item];

@@ -95,7 +95,6 @@ class _WriteState extends State<Write> {
   // 이미지를 서버에 전송
   Future _uploadImagesToServer({
     required List<XFile> selectedFiles,
-    //required String userId,
   }) async {
     final uri = Uri.parse('https://ubuntu.i4624.tk/image/upload');
     final request = http.MultipartRequest('POST', uri);
@@ -103,7 +102,7 @@ class _WriteState extends State<Write> {
       request.files.add(
         await http.MultipartFile.fromPath('filename', selectedFile.path),
       );
-      //request.fields['userId'] = UserInfo().userId;
+      request.fields['user'] = UserInfo().userId;
     }
     final response = await request.send();
     if (response.statusCode == 200) {
@@ -122,9 +121,8 @@ class _WriteState extends State<Write> {
   // imageuid를 get()방식을 통해 받기
   List<dynamic> imageJsonData = [];
   Future<List> _getImageIdData() async {
-    var url = Uri.parse('https://ubuntu.i4624.tk/image/sql/recent/i4624/2'
-        //'https://ubuntu.i4624.tk/image/sql/recent/${UserInfo().userId}/${_selectedFiles.length}'
-        );
+    var url = Uri.parse(
+        'https://ubuntu.i4624.tk/image/sql/recent/${UserInfo().userId}/${_selectedFiles.length}');
     var response = await http.get(url);
     if (response.statusCode == 200) {
       final List<dynamic> responseData =
@@ -138,7 +136,7 @@ class _WriteState extends State<Write> {
 
   // imageUid JSON -> Data
   List<Map<String, dynamic>> imageData = [];
-  Future<List<Map<String, dynamic>>> _convertImageData(
+  Future<List<Map<String, dynamic>>> _convertImageJsonData(
       List<dynamic> imageJsonData) async {
     imageJsonData = await _getImageIdData();
     return imageData = imageJsonData
@@ -534,7 +532,7 @@ class _WriteState extends State<Write> {
                   //userId: UserInfo().userId,
                 );
                 _getImageIdData();
-                _convertImageData(imageJsonData);
+                _convertImageJsonData(imageJsonData);
                 _saveData();
                 _sendDataToServer(
                   userNickName: UserInfo().userNickName,
@@ -831,51 +829,65 @@ class _WriteState extends State<Write> {
                     .toList(),
               ),
             ),
-            Row(
-              children: [
-                TextButton(
-                  onPressed: () {
-                    print("Get ImageData");
-                    _getImageIdData();
-                    //print(imageJsonData);
-                  },
-                  child: const Text("Get ImageData"),
-                ),
-                TextButton(
-                  onPressed: () {
-                    print("Print imageJsonData");
-                    print(imageJsonData);
-                  },
-                  child: const Text("Print imageJsonData"),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                TextButton(
-                  onPressed: () {
-                    print("Convert ImageData");
-                    _convertImageData(imageJsonData);
-                  },
-                  child: const Text("Convert ImageData"),
-                ),
-                TextButton(
-                  onPressed: () {
-                    print("Print ImageData");
-                    print(imageData);
-                  },
-                  child: const Text("Print ImageData"),
-                ),
-                TextButton(
-                  onPressed: () {
-                    print("Total Test");
-                    //_getImageIdData();
-                    _convertImageData(imageJsonData);
-                  },
-                  child: const Text("Print ImageData"),
-                ),
-              ],
-            ),
+            // Row(
+            //   children: [
+            //     TextButton(
+            //       onPressed: () {
+            //         print("Send Image");
+            //         _uploadImagesToServer(
+            //           selectedFiles: _selectedFiles,
+            //         );
+            //         //print(imageJsonData);
+            //       },
+            //       child: const Text("Send Image"),
+            //     ),
+            //   ],
+            // ),
+            // Row(
+            //   children: [
+            //     TextButton(
+            //       onPressed: () {
+            //         print("Get ImageData");
+            //         _getImageIdData();
+            //         //print(imageJsonData);
+            //       },
+            //       child: const Text("Get ImageData"),
+            //     ),
+            //     TextButton(
+            //       onPressed: () {
+            //         print("Print imageJsonData");
+            //         print(imageJsonData);
+            //       },
+            //       child: const Text("Print imageJsonData"),
+            //     ),
+            //   ],
+            // ),
+            // Row(
+            //   children: [
+            //     TextButton(
+            //       onPressed: () {
+            //         print("Convert ImageData");
+            //         _convertImageJsonData(imageJsonData);
+            //       },
+            //       child: const Text("Convert ImageData"),
+            //     ),
+            //     TextButton(
+            //       onPressed: () {
+            //         print("Print ImageData");
+            //         print(imageData);
+            //       },
+            //       child: const Text("Print ImageData"),
+            //     ),
+            //     TextButton(
+            //       onPressed: () {
+            //         print("Total Test");
+            //         //_getImageIdData();
+            //         _convertImageJsonData(imageJsonData);
+            //       },
+            //       child: const Text("Print ImageData"),
+            //     ),
+            //   ],
+            // ),
           ],
         );
       },
