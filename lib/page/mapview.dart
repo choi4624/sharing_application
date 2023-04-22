@@ -8,6 +8,7 @@ import 'package:geolocator/geolocator.dart';
 // ignore: unused_import
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
+import 'package:test_project/repository/contents_repository.dart';
 
 class MapView extends StatefulWidget {
   const MapView({Key? key}) : super(key: key);
@@ -44,6 +45,19 @@ class _MapViewState extends State<MapView> {
   void dispose() {
     super.dispose();
     _controller.dispose();
+  }
+
+  // 마커
+  // 세개의 오버레이 생성
+  final marker1 =
+      NMarker(id: '1', position: const NLatLng(37.5666102, 126.9783881));
+  //final marker2 = NMarker(id: '2', position: NLatLng(latitude, longitude));
+
+  late List marker = [];
+  void makeMaker() {
+    for (int i = 0; i < ContentsRepository().datas.length; i++) {
+      marker[i] = ContentsRepository().datas[i]["image"];
+    }
   }
 
   Future<void> _getCurrentLocation() async {
@@ -116,14 +130,15 @@ class _MapViewState extends State<MapView> {
     return NaverMap(
       onMapReady: (controller) {
         _controller = controller;
+        _controller.addOverlay(marker1);
       },
       options: NaverMapViewOptions(
         initialCameraPosition: NCameraPosition(
           target: _initialPosition,
           zoom: 16,
         ),
-        minZoom: 10,
-        maxZoom: 16,
+        // minZoom: 10,
+        // maxZoom: 16,
         maxTilt: 30,
         symbolScale: 1,
         locationButtonEnable: true,
