@@ -14,7 +14,7 @@ class MapView extends StatefulWidget {
   const MapView({Key? key}) : super(key: key);
 
   @override
-  _MapViewState createState() => _MapViewState();
+  State<MapView> createState() => _MapViewState();
 }
 
 class _MapViewState extends State<MapView> {
@@ -22,12 +22,6 @@ class _MapViewState extends State<MapView> {
   void initState() {
     super.initState();
     _getCurrentLocation();
-    _initMap();
-  }
-
-  Future<void> _initMap() async {
-    await _getCurrentLocation();
-    setState(() {});
   }
 
   final TextEditingController _textEditingController = TextEditingController();
@@ -37,7 +31,7 @@ class _MapViewState extends State<MapView> {
   late EdgeInsets safeArea;
   double drawerHeight = 0;
 
-  late NLatLng _initialPosition;
+  NLatLng _initialPosition = const NLatLng(0, 0);
   late NaverMapController _controller;
   //late GeocodingPlatform _geocoding;
 
@@ -155,7 +149,9 @@ class _MapViewState extends State<MapView> {
     return Scaffold(
       appBar: _appbarWidget(),
       extendBodyBehindAppBar: true,
-      body: _bodyWidget(),
+      body: _initialPosition.latitude != 0
+          ? _bodyWidget()
+          : const Center(child: CircularProgressIndicator()),
     );
   }
 }

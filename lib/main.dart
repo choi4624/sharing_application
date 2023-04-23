@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
+// ignore: unused_import
 import 'package:test_project/page/login.dart';
 
 void main() async {
