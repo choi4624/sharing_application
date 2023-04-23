@@ -8,12 +8,13 @@ import 'package:geolocator/geolocator.dart';
 // ignore: unused_import
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
+import 'package:test_project/repository/contents_repository.dart';
 
 class MapView extends StatefulWidget {
   const MapView({Key? key}) : super(key: key);
 
   @override
-  _MapViewState createState() => _MapViewState();
+  State<MapView> createState() => _MapViewState();
 }
 
 class _MapViewState extends State<MapView> {
@@ -21,12 +22,6 @@ class _MapViewState extends State<MapView> {
   void initState() {
     super.initState();
     _getCurrentLocation();
-    _initMap();
-  }
-
-  Future<void> _initMap() async {
-    await _getCurrentLocation();
-    setState(() {});
   }
 
   final TextEditingController _textEditingController = TextEditingController();
@@ -36,7 +31,7 @@ class _MapViewState extends State<MapView> {
   late EdgeInsets safeArea;
   double drawerHeight = 0;
 
-  late NLatLng _initialPosition;
+  NLatLng _initialPosition = const NLatLng(0, 0);
   late NaverMapController _controller;
   //late GeocodingPlatform _geocoding;
 
@@ -44,6 +39,19 @@ class _MapViewState extends State<MapView> {
   void dispose() {
     super.dispose();
     _controller.dispose();
+  }
+
+  // 마커
+  // 세개의 오버레이 생성
+  final marker1 =
+      NMarker(id: '1', position: const NLatLng(37.5666102, 126.9783881));
+  //final marker2 = NMarker(id: '2', position: NLatLng(latitude, longitude));
+
+  late List marker = [];
+  void makeMaker() {
+    for (int i = 0; i < ContentsRepository().datas.length; i++) {
+      marker[i] = ContentsRepository().datas[i]["image"];
+    }
   }
 
   Future<void> _getCurrentLocation() async {
@@ -116,14 +124,15 @@ class _MapViewState extends State<MapView> {
     return NaverMap(
       onMapReady: (controller) {
         _controller = controller;
+        _controller.addOverlay(marker1);
       },
       options: NaverMapViewOptions(
         initialCameraPosition: NCameraPosition(
           target: _initialPosition,
           zoom: 16,
         ),
-        minZoom: 10,
-        maxZoom: 16,
+        // minZoom: 10,
+        // maxZoom: 16,
         maxTilt: 30,
         symbolScale: 1,
         locationButtonEnable: true,
@@ -140,7 +149,9 @@ class _MapViewState extends State<MapView> {
     return Scaffold(
       appBar: _appbarWidget(),
       extendBodyBehindAppBar: true,
-      body: _bodyWidget(),
+      body: _initialPosition.latitude != 0
+          ? _bodyWidget()
+          : const Center(child: CircularProgressIndicator()),
     );
   }
 }
