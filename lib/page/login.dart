@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_project/page/control.dart';
 import 'package:http/http.dart' as http;
+import 'package:test_project/repository/contents_repository.dart';
 
 class LogIn extends StatefulWidget {
   const LogIn({super.key});
@@ -17,6 +18,7 @@ class _LogInState extends State<LogIn> {
   TextEditingController userPassword = TextEditingController();
   String? jwt;
 
+  // 앱내에 JWT 저장
   Future<void> saveJWT(String jwt) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('jwt', jwt);
@@ -24,66 +26,8 @@ class _LogInState extends State<LogIn> {
 
   Future<String?> getJWT() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
+    //print(prefs.getString('jwt'));
     return prefs.getString('jwt');
-    
-class _LogInState extends State<LogIn> {
-  TextEditingController inputUserId = TextEditingController();
-  TextEditingController inputUserPassword = TextEditingController();
-  String? jwt;
-  late String userId;
-  late String userPassword;
-
-  void controllerToTest() {
-    userId = inputUserId.text;
-    userPassword = inputUserPassword.text;
-    _sendDataToServer(userId: userId, password: userPassword);
-  }
-
-  Future _sendDataToServer({
-    required String userId,
-    required String password,
-  }) async {
-    final uri = Uri.parse('https://ubuntu.i4624.tk/login');
-    final headers = {'Content-Type': 'application/json'};
-    final body = jsonEncode({'key': 'value'});
-    final request = http.MultipartRequest('POST', uri);
-    request.fields['username'] = userId;
-    request.fields['password'] = password;
-    final response = await http
-        .post(
-          uri,
-          headers: headers,
-          body: jsonEncode(<String, String>{
-            'username': userId,
-            'password': password,
-          }),
-        )
-        .timeout(const Duration(seconds: 5)); //await request.send();
-    if (response.statusCode == 200) {
-      final responseHeader = response.headers;
-      if (responseHeader.isEmpty) {
-        print("responseBody is Empty");
-      }
-      setState(() {
-        jwt = responseHeader['authorization']!;
-        print(jwt);
-        print("데이터 전송");
-      });
-    } else {
-      print(response.reasonPhrase);
-      throw Exception('Failed to send data');
-    }
-  }
-
-  Future<void> _getTest() async {
-    var url = Uri.parse('https://ubuntu.i4624.tk/api/v1/user');
-    var response = await http.get(url);
-    if (response.statusCode == 200) {
-      final responseData = jsonDecode(utf8.decode(response.bodyBytes));
-      print(responseData);
-    } else {
-      throw Exception('Failed to get data');
-    }
   }
 
   Future<String?> _sendDataToServer({
@@ -113,7 +57,21 @@ class _LogInState extends State<LogIn> {
       return jwt;
     } else {
       print(response.reasonPhrase);
+      jwt = null;
       return throw Exception('Failed to send data');
+    }
+  }
+
+  // JWT를 변수에 저장(어플 종료 후 삭제)
+  Future<void> _saveJWT() async {
+    jwt = await _sendDataToServer(
+      userId: userId.text,
+      password: userPassword.text,
+    );
+    if (jwt != null) {
+      saveJWT(jwt!);
+    } else {
+      jwt = null;
     }
   }
 
@@ -132,7 +90,7 @@ class _LogInState extends State<LogIn> {
     return AppBar(
       title: const Text('로그인'),
       elevation: 0.0,
-      backgroundColor: Colors.redAccent,
+      backgroundColor: Colors.blueAccent,
       centerTitle: true,
     );
   }
@@ -189,35 +147,124 @@ class _LogInState extends State<LogIn> {
                               height: 50.0,
                               child: ElevatedButton(
                                 onPressed: () async {
-                                  jwt = await _sendDataToServer(
-                                    userId: userId.text,
-                                    password: userPassword.text,
-                                  );
-                                  if (jwt != null) {
-                                    saveJWT(jwt!);
-                                    // ignore: use_build_context_synchronously
-                                    Navigator.pop(context);
-                                    // ignore: use_build_context_synchronously
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const Control(),
-                                      ),
-                                    );
-                                  } else {
+                                  try {
+                                    await _saveJWT();
+                                    if (jwt != null) {
+                                      UserInfo().userId = userId.text;
+                                      UserInfo().password = userPassword.text;
+                                      // ignore: use_build_context_synchronously
+                                      Navigator.pop(context);
+                                      // ignore: use_build_context_synchronously
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const Control(),
+                                        ),
+                                      );
+                                    } else {
+                                      // ignore: use_build_context_synchronously
+                                      showDialog(
+                                        context: context,
+                                        barrierDismissible: false,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            contentPadding:
+                                                const EdgeInsets.fromLTRB(
+                                                    0, 20, 0, 5),
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        10.0)),
+                                            content: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: const [
+                                                Text(
+                                                  "ID 또는 패스워드를 확인해주세요.",
+                                                ),
+                                              ],
+                                            ),
+                                            actions: <Widget>[
+                                              Center(
+                                                child: SizedBox(
+                                                  width: 250,
+                                                  child: ElevatedButton(
+                                                    style: ButtonStyle(
+                                                      backgroundColor:
+                                                          MaterialStateColor
+                                                              .resolveWith(
+                                                        (states) {
+                                                          if (states.contains(
+                                                              MaterialState
+                                                                  .disabled)) {
+                                                            return Colors.grey;
+                                                          } else {
+                                                            return Colors.blue;
+                                                          }
+                                                        },
+                                                      ),
+                                                    ),
+                                                    child: const Text("확인"),
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    }
+                                  } catch (e) {
                                     showDialog(
                                       context: context,
+                                      barrierDismissible: false,
                                       builder: (BuildContext context) {
                                         return AlertDialog(
-                                          title: const Text("로그인 실패"),
-                                          content: const Text(
-                                              "아이디와 비밀번호를 다시 확인해주세요."),
+                                          contentPadding:
+                                              const EdgeInsets.fromLTRB(
+                                                  0, 20, 0, 5),
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10.0)),
+                                          content: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: const [
+                                              Text(
+                                                "ID 또는 패스워드를 확인해주세요.",
+                                              ),
+                                            ],
+                                          ),
                                           actions: <Widget>[
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                              },
-                                              child: const Text("확인"),
+                                            Center(
+                                              child: SizedBox(
+                                                width: 250,
+                                                child: ElevatedButton(
+                                                  style: ButtonStyle(
+                                                    backgroundColor:
+                                                        MaterialStateColor
+                                                            .resolveWith(
+                                                      (states) {
+                                                        if (states.contains(
+                                                            MaterialState
+                                                                .disabled)) {
+                                                          return Colors.grey;
+                                                        } else {
+                                                          return Colors.blue;
+                                                        }
+                                                      },
+                                                    ),
+                                                  ),
+                                                  child: const Text("확인"),
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                ),
+                                              ),
                                             ),
                                           ],
                                         );
@@ -226,7 +273,7 @@ class _LogInState extends State<LogIn> {
                                   }
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.orangeAccent,
+                                  backgroundColor: Colors.blueAccent,
                                 ),
                                 child: const Text("로그인"),
                               ),
@@ -241,9 +288,9 @@ class _LogInState extends State<LogIn> {
             ),
             TextButton(
               onPressed: () {
-                _getTest();
+                getJWT();
               },
-              child: const Text("Get Test"),
+              child: const Text("Get JWT"),
             ),
             TextButton(
               onPressed: () {
@@ -252,86 +299,6 @@ class _LogInState extends State<LogIn> {
               child: const Text("Result"),
             )
           ],
-              Form(
-                child: Theme(
-                  data: ThemeData(
-                    primaryColor: Colors.grey,
-                    inputDecorationTheme: const InputDecorationTheme(
-                      labelStyle: TextStyle(
-                        color: Colors.teal,
-                        fontSize: 15.0,
-                      ),
-                    ),
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.all(40.0),
-                    child: Builder(
-                      builder: (context) {
-                        return Column(
-                          children: [
-                            TextField(
-                              controller: inputUserId,
-                              autofocus: true,
-                              decoration:
-                                  const InputDecoration(labelText: 'ID 입력'),
-                              keyboardType: TextInputType.emailAddress,
-                            ),
-                            TextField(
-                              controller: inputUserPassword,
-                              decoration:
-                                  const InputDecoration(labelText: '비밀번호 입력'),
-                              keyboardType: TextInputType.text,
-                              obscureText: true, // 비밀번호 안보이도록 하는 것
-                            ),
-                            const SizedBox(
-                              height: 40.0,
-                            ),
-                            ButtonTheme(
-                                minWidth: 100.0,
-                                height: 50.0,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    //controllerToTest();
-                                    _sendDataToServer(
-                                        userId: inputUserId.text,
-                                        password: inputUserPassword.text);
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const Control()),
-                                    );
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.orangeAccent),
-                                  child: const Icon(
-                                    Icons.arrow_forward,
-                                    color: Colors.white,
-                                    size: 35.0,
-                                  ),
-                                ))
-                          ],
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  _getTest();
-                },
-                child: const Text("Get Test"),
-              ),
-              TextButton(
-                onPressed: () {
-                  print(jwt);
-                  //print(jwtData);
-                },
-                child: const Text("Result"),
-              )
-            ],
-          ),
         ),
       ),
     );

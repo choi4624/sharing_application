@@ -25,7 +25,6 @@ class _MapViewState extends State<MapView> {
   }
 
   final TextEditingController _textEditingController = TextEditingController();
-  final TextEditingController _searchController = TextEditingController();
   LocationData? _locationData;
   String? _locationText;
   late EdgeInsets safeArea;
@@ -149,9 +148,9 @@ class _MapViewState extends State<MapView> {
     return Scaffold(
       appBar: _appbarWidget(),
       extendBodyBehindAppBar: true,
-      body: _initialPosition.latitude != 0
-          ? _bodyWidget()
-          : const Center(child: CircularProgressIndicator()),
+      body: _initialPosition.latitude == 0 && _initialPosition.longitude == 0
+          ? const Center(child: CircularProgressIndicator())
+          : _bodyWidget(),
     );
   }
 }

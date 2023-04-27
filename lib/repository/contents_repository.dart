@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class UserInfo {
-  late String userId = "testUser_1";
+  late String userId;
   late String userNickName = "userA";
   late String password;
   late String address = "경기도 안양시 동안구";
@@ -168,7 +168,6 @@ class ContentsRepository {
     for (var i = 0; i < data.length; i++) {
       var item = data[i];
       //datas[item['image']] = serverURL + item['image'];
-      // category 값을 기준으로 Map에 저장합니다.
       if (datas[item['boardCategory']] == null) {
         datas[item['boardCategory']] = [item];
       } else {
@@ -186,7 +185,7 @@ class ContentsRepository {
       data = responseData
           .map((dynamic item) => Map<String, dynamic>.from(item))
           .toList();
-      jsonToData();
+      //jsonToData();
       return data;
     } else {
       throw Exception('Failed to load data');
