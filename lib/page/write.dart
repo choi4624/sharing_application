@@ -161,8 +161,8 @@ class _WriteState extends State<Write> {
     final request = http.MultipartRequest('POST', uri);
     //request.fields['userId'] = UserInfo().userId;
     for (final image in imageData) {
-      request.fields['imageUid[]'] = image['imageUid'];
-      request.fields['imageName[]'] = image['imageName'];
+      request.fields['imageUID[]'] = image['imageUid'];
+      //request.fields['imageName[]'] = image['imageName'];
     }
     request.fields['boardWriter'] = userNickName;
     request.fields['boardTitle'] = title;
