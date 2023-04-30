@@ -829,65 +829,65 @@ class _WriteState extends State<Write> {
                     .toList(),
               ),
             ),
-            // Row(
-            //   children: [
-            //     TextButton(
-            //       onPressed: () {
-            //         print("Send Image");
-            //         _uploadImagesToServer(
-            //           selectedFiles: _selectedFiles,
-            //         );
-            //         //print(imageJsonData);
-            //       },
-            //       child: const Text("Send Image"),
-            //     ),
-            //   ],
-            // ),
-            // Row(
-            //   children: [
-            //     TextButton(
-            //       onPressed: () {
-            //         print("Get ImageData");
-            //         _getImageIdData();
-            //         //print(imageJsonData);
-            //       },
-            //       child: const Text("Get ImageData"),
-            //     ),
-            //     TextButton(
-            //       onPressed: () {
-            //         print("Print imageJsonData");
-            //         print(imageJsonData);
-            //       },
-            //       child: const Text("Print imageJsonData"),
-            //     ),
-            //   ],
-            // ),
-            // Row(
-            //   children: [
-            //     TextButton(
-            //       onPressed: () {
-            //         print("Convert ImageData");
-            //         _convertImageJsonData(imageJsonData);
-            //       },
-            //       child: const Text("Convert ImageData"),
-            //     ),
-            //     TextButton(
-            //       onPressed: () {
-            //         print("Print ImageData");
-            //         print(imageData);
-            //       },
-            //       child: const Text("Print ImageData"),
-            //     ),
-            //     TextButton(
-            //       onPressed: () {
-            //         print("Total Test");
-            //         //_getImageIdData();
-            //         _convertImageJsonData(imageJsonData);
-            //       },
-            //       child: const Text("Print ImageData"),
-            //     ),
-            //   ],
-            // ),
+            Row(
+              children: [
+                TextButton(
+                  onPressed: () {
+                    print("Send Image");
+                    _uploadImagesToServer(
+                      selectedFiles: _selectedFiles,
+                    );
+                    //print(imageJsonData);
+                  },
+                  child: const Text("Send Image"),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                TextButton(
+                  onPressed: () {
+                    print("Get ImageData");
+                    _getImageIdData();
+                    //print(imageJsonData);
+                  },
+                  child: const Text("Get ImageData"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    print("Print imageJsonData");
+                    print(imageJsonData);
+                  },
+                  child: const Text("Print imageJsonData"),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                TextButton(
+                  onPressed: () {
+                    print("Convert ImageData");
+                    _convertImageJsonData(imageJsonData);
+                  },
+                  child: const Text("Convert ImageData"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    print("Print ImageData");
+                    print(imageData);
+                  },
+                  child: const Text("Print ImageData"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    print("Total Test");
+                    //_getImageIdData();
+                    _convertImageJsonData(imageJsonData);
+                  },
+                  child: const Text("Print ImageData"),
+                ),
+              ],
+            ),
           ],
         );
       },

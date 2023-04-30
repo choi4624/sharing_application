@@ -8,6 +8,7 @@ import 'package:geolocator/geolocator.dart';
 // ignore: unused_import
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
+import 'package:snapping_sheet/snapping_sheet.dart';
 import 'package:test_project/repository/contents_repository.dart';
 
 class MapView extends StatefulWidget {
@@ -32,7 +33,6 @@ class _MapViewState extends State<MapView> {
 
   NLatLng _initialPosition = const NLatLng(0, 0);
   late NaverMapController _controller;
-  //late GeocodingPlatform _geocoding;
 
   @override
   void dispose() {
@@ -120,21 +120,58 @@ class _MapViewState extends State<MapView> {
   }
 
   Widget _bodyWidget() {
-    return NaverMap(
-      onMapReady: (controller) {
-        _controller = controller;
-        _controller.addOverlay(marker1);
-      },
-      options: NaverMapViewOptions(
-        initialCameraPosition: NCameraPosition(
-          target: _initialPosition,
-          zoom: 16,
+    return SnappingSheet(
+      grabbingHeight: 40,
+      grabbing: Container(
+        height: 56,
+        color: Colors.white,
+        alignment: Alignment.center,
+        child: const Text('지도 리스트'),
+      ),
+      sheetBelow: SnappingSheetContent(
+        draggable: true,
+        child: Container(
+          height: 56,
+          color: Colors.grey[300],
+          alignment: Alignment.center,
+          child: const Text('지도 리스트'),
         ),
-        // minZoom: 10,
-        // maxZoom: 16,
-        maxTilt: 30,
-        symbolScale: 1,
-        locationButtonEnable: true,
+      ),
+      snappingPositions: const [
+        SnappingPosition.factor(
+          positionFactor: 0.0,
+          snappingCurve: Curves.easeOutExpo,
+          snappingDuration: Duration(seconds: 1),
+          grabbingContentOffset: GrabbingContentOffset.top,
+        ),
+        SnappingPosition.pixels(
+          positionPixels: 500,
+          snappingCurve: Curves.elasticOut,
+          snappingDuration: Duration(milliseconds: 1750),
+        ),
+        SnappingPosition.factor(
+          positionFactor: 1.0,
+          snappingCurve: Curves.bounceOut,
+          snappingDuration: Duration(seconds: 1),
+          grabbingContentOffset: GrabbingContentOffset.bottom,
+        ),
+      ],
+      child: NaverMap(
+        onMapReady: (controller) {
+          _controller = controller;
+          _controller.addOverlay(marker1);
+        },
+        options: NaverMapViewOptions(
+          initialCameraPosition: NCameraPosition(
+            target: _initialPosition,
+            zoom: 16,
+          ),
+          // minZoom: 10,
+          // maxZoom: 16,
+          maxTilt: 30,
+          symbolScale: 1,
+          locationButtonEnable: true,
+        ),
       ),
     );
   }
