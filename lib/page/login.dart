@@ -26,7 +26,7 @@ class _LogInState extends State<LogIn> {
 
   Future<String?> getJWT() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    //print(prefs.getString('jwt'));
+    print(prefs.getString('jwt'));
     return prefs.getString('jwt');
   }
 
@@ -52,6 +52,7 @@ class _LogInState extends State<LogIn> {
       }
       setState(() {
         jwt = responseHeader['authorization']!;
+        print(response.headers);
         print(jwt);
       });
       return jwt;
