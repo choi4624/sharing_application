@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class UserInfo {
-  late String userId;
+  late String userId = "rkskek12";
   late String userNickName = "userA";
   late String password;
   late String address = "경기도 안양시 동안구";
