@@ -39,7 +39,6 @@ class _HomeState extends State<Home> {
     return AppBar(
       title: GestureDetector(
         onTap: () {
-          print("click event");
           ContentsRepository().loadData();
         },
         child: PopupMenuButton<String>(
@@ -88,22 +87,22 @@ class _HomeState extends State<Home> {
           ),
         ),
       ),
-      backgroundColor: Colors.white,
-      elevation: 1, // 그림자를 표현되는 높이 3d 측면의 높이를 뜻함.
+      backgroundColor: Colors.white, //const Color.fromARGB(255, 184, 210, 255),
+      elevation: 1.5, // 그림자를 표현되는 높이 3d 측면의 높이를 뜻함.
       actions: [
-        IconButton(
-          onPressed: () {},
-          icon: const Icon(
-            Icons.search,
-            color: Colors.black,
-          ),
-        ),
+        // IconButton(
+        //   onPressed: () {},
+        //   icon: const Icon(
+        //     Icons.search,
+        //     color: Colors.black,
+        //   ),
+        // ),
         Padding(
           padding: const EdgeInsets.only(right: 10),
           child: IconButton(
             onPressed: () {},
             icon: const Icon(
-              Icons.info,
+              Icons.more_vert,
               color: Colors.black,
             ),
           ),
@@ -128,20 +127,38 @@ class _HomeState extends State<Home> {
 
   // currentLocation으로 판매, 구매, 대여 페이지 선택
   Future<List<Map<String, dynamic>>> _loadContents() async {
-    ContentsRepository().loadData();
     List<Map<String, dynamic>> responseData =
         await ContentsRepository().loadContentsFromLocation(currentLocation);
     return responseData;
   }
+
+  //수정 필요 -> 이미지 로딩바 구현
+  // Widget _loadingImageInterface(List<Map<String, dynamic>>? datas, index) {
+  //   return Image.network(
+  //     datas![index]["image"][0],
+  //     width: 100,
+  //     height: 100,
+  //     scale: 1,
+  //     fit: BoxFit.cover,
+  //     errorBuilder:
+  //         (BuildContext context, Object exception, StackTrace? stackTrace) {
+  //       return Image.asset(
+  //         "assets/images/404 Error.jpg",
+  //         width: 100,
+  //         height: 100,
+  //       );
+  //     },
+  //   );
+  // }
 
   Widget _makeDataList(List<Map<String, dynamic>>? datas) {
     int size = datas == null ? 0 : datas.length;
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       itemBuilder: (BuildContext context, int index) {
-        if (datas[index]["image"].isEmpty) {
-          datas[index]["image"] = [
-            "https://png.pngtree.com/png-vector/20190820/ourlarge/pngtree-no-image-vector-illustration-isolated-png-image_1694547.jpg"
+        if (datas[index]["imageList"].isEmpty) {
+          datas[index]["imageList"] = [
+            "https://storyset.com/illustration/oops-404-error-with-a-broken-robot/rafiki"
           ];
         }
         return GestureDetector(
@@ -150,24 +167,13 @@ class _HomeState extends State<Home> {
               context,
               MaterialPageRoute(
                 builder: (BuildContext context) {
-                  datas[index]["id"];
-                  datas[index]["boardWriter"];
-                  datas[index]["boardTitle"];
-                  datas[index]["boardContents"];
-                  datas[index]["location"];
-                  datas[index]["price"];
-                  datas[index]["boardHits"];
-                  datas[index]["boardCreatedTime"];
-                  datas[index]["boardUpdatedTime"];
-                  datas[index]["boardCategory"];
-                  datas[index]["image"];
-                  //datas[index]["like"];
                   return DetailContentView(data: datas[index]);
                 },
               ),
             );
           },
           child: Container(
+            color: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Row(
               children: [
@@ -176,11 +182,19 @@ class _HomeState extends State<Home> {
                     Radius.circular(10),
                   ),
                   child: Image.network(
-                    datas[index]["image"][0],
+                    datas[index]["imageList"][0],
                     width: 100,
                     height: 100,
-                    scale: 0.1,
+                    scale: 1,
                     fit: BoxFit.cover,
+                    errorBuilder: (BuildContext context, Object exception,
+                        StackTrace? stackTrace) {
+                      return Image.asset(
+                        "assets/images/No_image.jpg",
+                        width: 100,
+                        height: 100,
+                      );
+                    },
                   ),
                 ),
                 Expanded(
@@ -191,7 +205,7 @@ class _HomeState extends State<Home> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          datas[index]["boardTitle"]!,
+                          datas[index]["title"]!,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             fontSize: 15,
@@ -219,31 +233,26 @@ class _HomeState extends State<Home> {
                         const SizedBox(
                           height: 5,
                         ),
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              const Icon(
-                                Icons.remove_red_eye_outlined,
-                                color: Color.fromARGB(255, 64, 64, 64),
-                                size: 17,
-                              ),
-                              // SvgPicture.asset(
-                              //   "assets/svg/heart_off.svg",
-                              //   width: 13,
-                              //   height: 13,
-                              // ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              Text(
-                                //datas[index]["like"].toString(),
-                                datas[index]["boardHits"].toString(),
-                              ),
-                            ],
-                          ),
-                        ),
+                        // Expanded(
+                        //   child: Row(
+                        //     mainAxisAlignment: MainAxisAlignment.end,
+                        //     crossAxisAlignment: CrossAxisAlignment.end,
+                        //     children: [
+                        //       const Icon(
+                        //         Icons.remove_red_eye_outlined,
+                        //         color: Color.fromARGB(255, 64, 64, 64),
+                        //         size: 17,
+                        //       ),
+                        //       const SizedBox(
+                        //         width: 5,
+                        //       ),
+                        //       // Text(
+                        //       //   //datas[index]["like"].toString(),
+                        //       //   datas[index]["boardHits"].toString(),
+                        //       // ),
+                        //     ],
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),
@@ -272,12 +281,12 @@ class _HomeState extends State<Home> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return const Center(child: Text("데이터 오류"));
+            return const Center(child: Text("데이터를 불러올 수 없습니다."));
           }
           if (snapshot.hasData) {
             return _makeDataList(snapshot.data);
           }
-          return const Center(child: Text("해당 지역에 데이터가 없습니다."));
+          return const Center(child: Text("해당 거래방식에 대한 데이터가 없습니다."));
         });
   }
 

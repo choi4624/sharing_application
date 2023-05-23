@@ -12,16 +12,13 @@ class _UserState extends State<User> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-      ),
       body: Container(
         padding: const EdgeInsets.only(left: 16, top: 25, right: 16),
         child: ListView(
           children: [
             const Text(
               "설정",
-              style: TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
+              style: TextStyle(fontSize: 25, fontWeight: FontWeight.w700),
             ),
             const SizedBox(
               height: 40,
@@ -48,10 +45,9 @@ class _UserState extends State<User> {
             const SizedBox(
               height: 10,
             ),
+            buildAccountOptionRow(context, "닉네임 변경"),
             buildAccountOptionRow(context, "비밀번호 변경"),
             buildAccountOptionRow(context, "연락처 변경"),
-            buildAccountOptionRow(context, "SNS 연결"),
-            buildAccountOptionRow(context, "개인 정보 보호 및 보안"),
             const SizedBox(
               height: 40,
             ),
@@ -77,10 +73,10 @@ class _UserState extends State<User> {
             const SizedBox(
               height: 10,
             ),
-            buildNotificationOptionRow("관심 상품 알림", true),
-            buildNotificationOptionRow("계정 활동", true),
+            buildNotificationOptionRow("Empty", true),
+            buildNotificationOptionRow("Empty", true),
             const SizedBox(
-              height: 50,
+              height: 150,
             ),
             Center(
               child: OutlinedButton(
