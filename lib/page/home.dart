@@ -160,6 +160,8 @@ class _HomeState extends State<Home> {
           datas[index]["imageList"] = [
             "https://storyset.com/illustration/oops-404-error-with-a-broken-robot/rafiki"
           ];
+        if (datas[index]["image"].isEmpty) {
+          datas[index]["image"] = ["assets/images/No_image.jpg"];
         }
         return GestureDetector(
           onTap: () {
@@ -253,6 +255,26 @@ class _HomeState extends State<Home> {
                         //     ],
                         //   ),
                         // ),
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              const Icon(
+                                Icons.remove_red_eye_outlined,
+                                color: Color.fromARGB(255, 64, 64, 64),
+                                size: 17,
+                              ),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              Text(
+                                //datas[index]["like"].toString(),
+                                datas[index]["boardHits"].toString(),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
