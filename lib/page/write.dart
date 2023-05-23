@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:test_project/page/control.dart';
 import 'package:test_project/repository/contents_repository.dart';
+import 'package:kpostal/kpostal.dart';
 
 class Write extends StatefulWidget {
   const Write({super.key});
@@ -46,14 +47,14 @@ class _WriteState extends State<Write> {
   // 카테고리 선택
   final Map<String, dynamic> productCategoryOptionsTypeToString = {
     "default": "카테고리",
-    "electronics": "디지털/가전",
+    "electronics": "디지털/전자",
     "tools": "공구",
     "clothes": "의류",
     "others": "기타"
   };
 
   // 거래방식 선택
-  final Map<String, dynamic> categoryOptionsTypeToString = {
+  final Map<String, dynamic> boardCategoryOptionsTypeToString = {
     "default": "거래방식",
     "sell": "판매",
     "buy": "구매",
@@ -61,9 +62,9 @@ class _WriteState extends State<Write> {
   };
 
   // textfield에서 입력받은 데이터를 변수에 저장하는 함수
-  void _saveData() {
-    userId = UserInfo().userId;
-    userNickName = UserInfo().userNickName;
+  Future<void> _saveData({required String userId}) async {
+    userId = userId;
+    userNickName = UserInfo().name;
     title = _titleController.text;
     contents = _contentsController.text; // 카테고리
     productCategory = productCategoryCurrentLocation;
@@ -92,7 +93,8 @@ class _WriteState extends State<Write> {
     print("Image List length: ${_selectedFiles.length.toString()}");
   }
 
-  // 이미지를 서버에 전송
+  List<Map<String, dynamic>> imageData = [];
+  List<dynamic> imageJsonData = [];
   Future _uploadImagesToServer({
     required List<XFile> selectedFiles,
   }) async {
@@ -102,27 +104,24 @@ class _WriteState extends State<Write> {
       request.files.add(
         await http.MultipartFile.fromPath('filename', selectedFile.path),
       );
-      request.fields['user'] = UserInfo().userId;
+      request.fields['user'] = UserInfo.userId;
     }
     final response = await request.send();
     if (response.statusCode == 200) {
-      final responseBody = await response.stream.bytesToString();
-      final jsonResponse = json.decode(responseBody);
-      setState(() {
-        _uploadedImageUrl = jsonResponse['imageUrl'];
-        print("이미지 전송");
-      });
+      await _updateImageData();
     } else {
       throw Exception('Failed to send images');
-      //print(response.reasonPhrase);
     }
   }
 
-  // imageuid를 get()방식을 통해 받기
-  List<dynamic> imageJsonData = [];
-  Future<List> _getImageIdData() async {
+  Future<void> _updateImageData() async {
+    imageJsonData = await _getImageIdData();
+    imageData = _convertImageJsonData(imageJsonData);
+  }
+
+  Future<List<dynamic>> _getImageIdData() async {
     var url = Uri.parse(
-        'https://ubuntu.i4624.tk/image/sql/recent/${UserInfo().userId}/${_selectedFiles.length}');
+        'https://ubuntu.i4624.tk/image/sql/recent/${UserInfo.userId}/${_selectedFiles.length}');
     var response = await http.get(url);
     if (response.statusCode == 200) {
       final List<dynamic> responseData =
@@ -134,51 +133,55 @@ class _WriteState extends State<Write> {
     }
   }
 
-  // imageUid JSON -> Data
-  List<Map<String, dynamic>> imageData = [];
-  Future<List<Map<String, dynamic>>> _convertImageJsonData(
-      List<dynamic> imageJsonData) async {
-    imageJsonData = await _getImageIdData();
-    return imageData = imageJsonData
-        .map<Map<String, dynamic>>((data) => {
+  List<Map<String, dynamic>> _convertImageJsonData(
+      List<dynamic> imageJsonData) {
+    return imageJsonData
+        .map<Map<String, int>>((data) => {
               'imageUid': data[0],
-              'imageName': data[1] as String,
             })
         .toList();
   }
 
   // Send Data To Server
   Future _sendDataToServer({
-    required List<Map<String, dynamic>> imageData,
-    required String userNickName,
+    required UserInfo user,
+    required String userId,
     required String title,
-    required String contents,
-    required String category,
+    required String contents, // 카테고리
+    required String productCategory,
+    required String category, //거래방식
     required String location,
     required int price,
   }) async {
-    final uri = Uri.parse('https://ubuntu.i4624.tk/board/save');
-    final request = http.MultipartRequest('POST', uri);
-    //request.fields['userId'] = UserInfo().userId;
-    for (final image in imageData) {
-      request.fields['imageUID[]'] = image['imageUid'];
-      //request.fields['imageName[]'] = image['imageName'];
-    }
-    request.fields['boardWriter'] = userNickName;
-    request.fields['boardTitle'] = title;
-    request.fields['boardContents'] = contents;
-    request.fields['boardCategory'] = category;
-    request.fields['location'] = location;
-    request.fields['price'] = price.toString();
-    final response = await request.send();
+    await _uploadImagesToServer(selectedFiles: _selectedFiles);
+    final uri = Uri.parse('https://ubuntu.i4624.tk/api/v1/post');
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ${UserInfo.jwt}'
+    };
+    final body = jsonEncode({
+      'title': title,
+      'content': contents,
+      'location': location,
+      'price': price,
+      'writer': json.encode(user.toJson()),
+      'category': category,
+      'imageIds':
+          imageData.map<int>((item) => item['imageUid'] as int).toList(),
+      'boardCategory': category,
+      'itemCategory': productCategory,
+    });
+    final response = await http
+        .post(
+          uri,
+          headers: headers,
+          body: body,
+        )
+        .timeout(const Duration(seconds: 5));
     if (response.statusCode == 200) {
-      final responseBody = await response.stream.bytesToString();
-      final jsonResponse = json.decode(responseBody);
-      setState(() {
-        _uploadedImageUrl = jsonResponse['imageUrl'];
-        print("데이터 전송");
-      });
+      print(response.statusCode);
     } else {
+      print(response.statusCode);
       print(response.reasonPhrase);
       throw Exception('Failed to send total data');
     }
@@ -237,8 +240,8 @@ class _WriteState extends State<Write> {
                       ? Colors.blue
                       : Colors.black),
             ),
-            onPressed: () {
-              // 거래방식 정보가 비어있을 때
+            onPressed: () async {
+              //거래방식 정보가 비어있을 때
               if (categoryCurrentLocation == "default") {
                 showDialog(
                   context: context,
@@ -490,7 +493,7 @@ class _WriteState extends State<Write> {
                   },
                 );
               }
-              // else if (_imageFile == null) {
+              // else if (_selectedFiles.isEmpty) {
               //   showDialog(
               //     context: context,
               //     barrierDismissible: false,
@@ -527,22 +530,16 @@ class _WriteState extends State<Write> {
               // }
               // 모든 정보가 입력되었을 때
               else {
-                _uploadImagesToServer(
-                  selectedFiles: _selectedFiles,
-                  //userId: UserInfo().userId,
-                );
-                _getImageIdData();
-                _convertImageJsonData(imageJsonData);
-                _saveData();
                 _sendDataToServer(
-                  userNickName: UserInfo().userNickName,
-                  imageData: imageData,
-                  title: title,
-                  contents: contents,
-                  category: category,
-                  location: location,
-                  price: price,
-                );
+                    user: UserInfo(),
+                    userId: UserInfo.userId,
+                    title: _titleController.text,
+                    contents: _contentsController.text,
+                    productCategory: productCategoryCurrentLocation,
+                    category: categoryCurrentLocation,
+                    location: _locationController.text,
+                    price:
+                        int.parse(_priceController.text.replaceAll(',', '')));
                 print("데이터 전송");
                 Navigator.pop(context);
                 Navigator.push(
@@ -618,7 +615,7 @@ class _WriteState extends State<Write> {
                           children: [
                             //앱 내에서 좌측 상단바 출력을 위한 데이터
                             Text(
-                              categoryOptionsTypeToString[
+                              boardCategoryOptionsTypeToString[
                                   categoryCurrentLocation]!,
                               style: const TextStyle(
                                 color: Colors.black,
@@ -658,7 +655,7 @@ class _WriteState extends State<Write> {
                         return [
                           const PopupMenuItem(
                             value: "electronics",
-                            child: Text("디지털/가전"),
+                            child: Text("디지털/전자"),
                           ),
                           const PopupMenuItem(
                             value: "tools",
@@ -723,25 +720,25 @@ class _WriteState extends State<Write> {
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
               child: TextField(
                 controller: _locationController,
-                //readOnly: true,
-                // onTap: () async {
-                //   await Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //       builder: (_) => KpostalView(
-                //         callback: (Kpostal result) {
-                //           print(result.address);
-                //           setState(() {
-                //             location =
-                //                 result.address; // 주소를 선택하면 해당 값을 상태 변수에 저장
-                //             _locationController.text =
-                //                 location; // 상태 변수의 값을 TextField에 출력
-                //           });
-                //         },
-                //       ),
-                //     ),
-                //   );
-                // },
+                readOnly: true,
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => KpostalView(
+                        callback: (Kpostal result) {
+                          print(result.address);
+                          setState(() {
+                            location =
+                                result.address; // 주소를 선택하면 해당 값을 상태 변수에 저장
+                            _locationController.text =
+                                location; // 상태 변수의 값을 TextField에 출력
+                          });
+                        },
+                      ),
+                    ),
+                  );
+                },
                 decoration: const InputDecoration(
                   enabledBorder: UnderlineInputBorder(),
                   isDense: true,
@@ -829,65 +826,6 @@ class _WriteState extends State<Write> {
                     .toList(),
               ),
             ),
-            Row(
-              children: [
-                TextButton(
-                  onPressed: () {
-                    print("Send Image");
-                    _uploadImagesToServer(
-                      selectedFiles: _selectedFiles,
-                    );
-                    //print(imageJsonData);
-                  },
-                  child: const Text("Send Image"),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                TextButton(
-                  onPressed: () {
-                    print("Get ImageData");
-                    _getImageIdData();
-                    //print(imageJsonData);
-                  },
-                  child: const Text("Get ImageData"),
-                ),
-                TextButton(
-                  onPressed: () {
-                    print("Print imageJsonData");
-                    print(imageJsonData);
-                  },
-                  child: const Text("Print imageJsonData"),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                TextButton(
-                  onPressed: () {
-                    print("Convert ImageData");
-                    _convertImageJsonData(imageJsonData);
-                  },
-                  child: const Text("Convert ImageData"),
-                ),
-                TextButton(
-                  onPressed: () {
-                    print("Print ImageData");
-                    print(imageData);
-                  },
-                  child: const Text("Print ImageData"),
-                ),
-                TextButton(
-                  onPressed: () {
-                    print("Total Test");
-                    //_getImageIdData();
-                    _convertImageJsonData(imageJsonData);
-                  },
-                  child: const Text("Print ImageData"),
-                ),
-              ],
-            ),
           ],
         );
       },
@@ -910,7 +848,6 @@ class _WriteState extends State<Write> {
         onPressed: () {
           print('이미지 추가');
           _selectImages();
-          //_selectImage();
         },
         tooltip: 'Increment',
         backgroundColor: const Color.fromARGB(255, 200, 200, 200),

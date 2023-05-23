@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 class Chat extends StatefulWidget {
   const Chat({super.key});
@@ -42,15 +43,22 @@ class _ChatState extends State<Chat> {
     );
   }
 
+  Widget _bodyWiget() {
+    return InAppWebView(
+      initialUrlRequest: URLRequest(
+        url: Uri.parse('https://node.i4624.tk/'),
+        //url: Uri.parse('http://map.naver.com/'),
+      ),
+      initialOptions: InAppWebViewGroupOptions(
+          android: AndroidInAppWebViewOptions(useHybridComposition: true)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _appbarWidget(),
-      body: const SizedBox(
-        child: Center(
-          child: Text("채팅 페이지"),
-        ),
-      ),
+      appBar: AppBar(),
+      body: _bodyWiget(),
     );
   }
 }

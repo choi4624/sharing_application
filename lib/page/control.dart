@@ -4,7 +4,6 @@ import 'package:test_project/page/chat.dart';
 //import 'package:test_project/page/image.dart';
 import 'package:test_project/page/home.dart';
 import 'package:test_project/page/mapview.dart';
-import 'package:test_project/page/user.dart';
 import 'package:test_project/page/write.dart';
 
 class Control extends StatefulWidget {
@@ -29,8 +28,8 @@ class _ControlState extends State<Control> {
         return const MapView();
       case 3:
         return const Chat();
-      case 4:
-        return const User();
+      // case 4:
+      //   return const User();
       default:
         return Home();
     }
@@ -51,6 +50,7 @@ class _ControlState extends State<Control> {
         child: SvgPicture.asset(
           "assets/svg/${iconName}_on.svg",
           width: 22,
+          color: Colors.black,
         ),
       ),
       label: label,
@@ -61,6 +61,8 @@ class _ControlState extends State<Control> {
   Widget _bottomNavigationBarWidget() {
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
+      backgroundColor: Colors.white, //const Color.fromARGB(255, 184, 210, 255),
+      elevation: 10.0,
       onTap: (int index) {
         setState(() {
           _currentPageIndex = index;
@@ -74,8 +76,8 @@ class _ControlState extends State<Control> {
         _bottomNavigationBarItem("home", "홈"),
         _bottomNavigationBarItem("notes", "글 작성"),
         _bottomNavigationBarItem("location", "지도"),
-        _bottomNavigationBarItem("chat", "채팅"),
-        _bottomNavigationBarItem("user", "사용자"),
+        _bottomNavigationBarItem("chat", "중계기"),
+        //_bottomNavigationBarItem("user", "사용자"),
       ],
     );
   }

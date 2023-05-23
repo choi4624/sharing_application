@@ -1,4 +1,3 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:test_project/page/home.dart';
 import '../repository/contents_repository.dart';
@@ -8,21 +7,20 @@ class DetailContentView extends StatefulWidget {
   DetailContentView({Key? key, required this.data}) : super(key: key);
 
   @override
-  _DetailContentViewState createState() => _DetailContentViewState();
+  State<DetailContentView> createState() => _DetailContentViewState();
 }
 
 class _DetailContentViewState extends State<DetailContentView>
     with TickerProviderStateMixin {
-  final ContentsRepository contentsRepository = ContentsRepository();
-  final scaffoldKey = GlobalKey<ScaffoldState>();
-  late Size size;
-
-  late List<String> imgList;
-  late int _current;
   ScrollController controller = ScrollController();
   double locationAlpha = 0;
+  final ContentsRepository contentsRepository = ContentsRepository();
+  final scaffoldKey = GlobalKey<ScaffoldState>();
   late AnimationController _animationController;
   late Animation _colorTween;
+  late List<dynamic> imgList;
+  late Size size;
+  int _currentPage = 0;
 
   @override
   void initState() {
@@ -30,27 +28,10 @@ class _DetailContentViewState extends State<DetailContentView>
     _animationController = AnimationController(vsync: this);
     _colorTween = ColorTween(begin: Colors.white, end: Colors.black)
         .animate(_animationController);
-    imgList = widget.data["image"];
-    _current = 0;
+    imgList = widget.data["imageList"];
+    _currentPage = 0;
     // _loadMyFavoriteContentState();
-    controller.addListener(() {
-      setState(() {
-        if (controller.offset > 255) {
-          locationAlpha = 255;
-        } else {
-          locationAlpha = controller.offset;
-        }
-        _animationController.value = locationAlpha / 255;
-      });
-    });
   }
-
-  // _loadMyFavoriteContentState() async {
-  //   bool ck = await contentsRepository.isMyFavoriteContents(widget.data["cid"]);
-  //   setState(() {
-  //     isMyFavoriteContent = ck;
-  //   });
-  // }
 
   @override
   void didChangeDependencies() {
@@ -75,7 +56,6 @@ class _DetailContentViewState extends State<DetailContentView>
       backgroundColor: Colors.white.withAlpha(locationAlpha.toInt()),
       elevation: 0,
       actions: [
-        IconButton(onPressed: () {}, icon: _makeIcon(Icons.share)),
         IconButton(onPressed: () {}, icon: _makeIcon(Icons.more_vert)),
       ],
     );
@@ -85,33 +65,43 @@ class _DetailContentViewState extends State<DetailContentView>
     return SizedBox(
       height: size.width * 0.8,
       child: Stack(
+        alignment: Alignment.bottomRight,
         children: [
-          Hero(
-            tag: widget.data["id"],
-            child: CarouselSlider(
-              options: CarouselOptions(
-                  height: size.width * 0.8,
-                  initialPage: 0,
-                  enableInfiniteScroll: true,
-                  viewportFraction: 1,
-                  enlargeCenterPage: false,
-                  onPageChanged: (index, reason) {
-                    setState(() {
-                      _current = index;
-                    });
-                  }),
-              items: imgList.map((i) {
-                return SizedBox(
-                  width: size.width,
-                  height: size.width,
-                  child: Image.network(
-                    widget.data["image"][_current],
-                    width: double.infinity,
-                    scale: 0.1,
-                    fit: BoxFit.cover,
-                  ),
-                );
-              }).toList(),
+          PageView.builder(
+            itemCount: widget.data["imageList"].length,
+            onPageChanged: (index) {
+              setState(() {
+                _currentPage = index;
+              });
+            },
+            itemBuilder: (context, index) {
+              return SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: Image.network(
+                  widget.data["imageList"][index],
+                  fit: BoxFit.cover,
+                  errorBuilder: (BuildContext context, Object exception,
+                      StackTrace? stackTrace) {
+                    return Image.asset(
+                      "assets/images/No_image.jpg",
+                      width: 100,
+                      height: 100,
+                    );
+                  },
+                ),
+              );
+            },
+            //enableInfiniteScroll: true,
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+            margin: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.8),
+                borderRadius: BorderRadius.circular(500)),
+            child: Text(
+              '${_currentPage + 1}/${widget.data["imageList"].length}',
+              style: const TextStyle(color: Colors.white),
             ),
           ),
           Positioned(
@@ -120,21 +110,23 @@ class _DetailContentViewState extends State<DetailContentView>
             right: 0,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(imgList.length, (index) {
+              children: List.generate(widget.data['imageList'].length, (index) {
                 return Container(
                   width: 8.0,
                   height: 8.0,
                   margin: const EdgeInsets.symmetric(
-                      vertical: 10.0, horizontal: 5.0),
+                    vertical: 10.0,
+                    horizontal: 5.0,
+                  ),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: _current == index
+                    color: _currentPage == index
                         ? Colors.black //Colors.white
                         : Colors.grey
                             .withOpacity(0.4), //Colors.white.withOpacity(0.4),
                   ),
                 );
-              }).toList(),
+              }),
             ),
           )
         ],
@@ -162,7 +154,7 @@ class _DetailContentViewState extends State<DetailContentView>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.data["boardWriter"],
+                    widget.data["username"],
                     style: const TextStyle(
                         fontWeight: FontWeight.bold, fontSize: 16),
                   ),
@@ -195,14 +187,14 @@ class _DetailContentViewState extends State<DetailContentView>
         children: [
           const SizedBox(height: 20),
           Text(
-            widget.data["boardTitle"],
+            widget.data["title"],
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
           Text(
-            "디지털/가전 ∙ ${widget.data["boardCreatedTime"]}", //category 추가 건의
+            "${widget.data["itemCategory"]}", // ∙ ${widget.data["boardCreatedTime"]}", //category 추가 건의
             style: const TextStyle(
               fontSize: 12,
               color: Colors.grey,
@@ -210,21 +202,21 @@ class _DetailContentViewState extends State<DetailContentView>
           ),
           const SizedBox(height: 15),
           Text(
-            widget.data["boardContents"],
+            widget.data["content"],
             style: const TextStyle(fontSize: 15, height: 1.5),
           ),
           const SizedBox(height: 15),
-          Row(
-            children: [
-              Text(
-                "조회수 ∙ ${widget.data["boardHits"].toString()}",
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey,
-                ),
-              ),
-            ],
-          ),
+          // Row(
+          //   children: [
+          //     Text(
+          //       "조회수 ∙ ${widget.data["boardHits"].toString()}",
+          //       style: const TextStyle(
+          //         fontSize: 12,
+          //         color: Colors.grey,
+          //       ),
+          //     ),
+          //   ],
+          // ),
           const SizedBox(height: 15),
         ],
       ),
@@ -253,7 +245,6 @@ class _DetailContentViewState extends State<DetailContentView>
       width: MediaQuery.of(context).size.width,
       padding: const EdgeInsets.symmetric(horizontal: 15),
       height: 55,
-      //color: Colors.white,
       child: Row(
         children: [
           // GestureDetector(
@@ -313,7 +304,7 @@ class _DetailContentViewState extends State<DetailContentView>
                     color: const Color.fromARGB(255, 132, 206, 243),
                   ),
                   child: const Text(
-                    "채팅으로 거래하기",
+                    "연락처",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
