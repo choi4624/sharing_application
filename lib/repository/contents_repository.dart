@@ -47,6 +47,7 @@ class ContentsRepository {
     try {
       originBoardDatas = await loadData();
       convertData(originBoardDatas);
+      print(originBoardDatas);
       print(mainBoardDatas);
     } catch (e) {
       print('Failed to load data: $e');
