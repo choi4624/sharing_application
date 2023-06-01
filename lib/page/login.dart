@@ -121,11 +121,6 @@ class _LogInState extends State<LogIn> {
               "assets/images/ex1.png",
             ),
           ),
-          // Flexible(
-          //   flex: 1,
-          //   fit: FlexFit.tight,
-          //   child: Container(),
-          // ),
           Flexible(
             flex: 7,
             child: Form(
@@ -168,14 +163,12 @@ class _LogInState extends State<LogIn> {
                                   await _saveJWT();
                                   if (jwt != null) {
                                     // ignore: use_build_context_synchronously
-                                    Navigator.pop(context);
-                                    // ignore: use_build_context_synchronously
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const Control(),
-                                      ),
-                                    );
+                                    Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const Control()),
+                                        (route) => false);
                                   } else {
                                     // ignore: use_build_context_synchronously
                                     showDialog(
@@ -249,7 +242,7 @@ class _LogInState extends State<LogIn> {
                                               CrossAxisAlignment.center,
                                           children: const [
                                             Text(
-                                              "서버와의 통신이 불안정합니다.",
+                                              "아이디와 비밀번호를 확인해주세요.",
                                             ),
                                           ],
                                         ),

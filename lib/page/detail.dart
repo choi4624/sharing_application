@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:test_project/page/home.dart';
+import 'package:test_project/page/pin.dart';
 import '../repository/contents_repository.dart';
 
 class DetailContentView extends StatefulWidget {
@@ -22,6 +23,18 @@ class _DetailContentViewState extends State<DetailContentView>
   late Size size;
   int _currentPage = 0;
 
+  late String currentLocation;
+  late String cabinetLocation;
+  final Map<String, String> optionsTypeToString = {
+    "setting": "PIN 설정",
+    "unlock": "PIN 해제",
+  };
+  final Map<String, dynamic> cabinetNumberToString = {
+    "default": "캐비넷 번호",
+    "1": "1번 캐비넷",
+    "2": "2번 캐비넷",
+  };
+
   @override
   void initState() {
     super.initState();
@@ -30,6 +43,8 @@ class _DetailContentViewState extends State<DetailContentView>
         .animate(_animationController);
     imgList = widget.data["imageList"];
     _currentPage = 0;
+    cabinetLocation = "default";
+    currentLocation = "setting";
     // _loadMyFavoriteContentState();
   }
 
@@ -55,13 +70,11 @@ class _DetailContentViewState extends State<DetailContentView>
       ),
       backgroundColor: Colors.white.withAlpha(locationAlpha.toInt()),
       elevation: 0,
-      actions: [
-        IconButton(onPressed: () {}, icon: _makeIcon(Icons.more_vert)),
-      ],
+      actions: const [],
     );
   }
 
-  Widget _makeSliderImage() {
+  Widget _makeImageSlider() {
     return SizedBox(
       height: size.width * 0.8,
       child: Stack(
@@ -134,7 +147,7 @@ class _DetailContentViewState extends State<DetailContentView>
     );
   }
 
-  Widget _sellerSimpleInfo() {
+  Widget _sellerInfo() {
     return Column(
       children: [
         Padding(
@@ -228,8 +241,8 @@ class _DetailContentViewState extends State<DetailContentView>
       SliverList(
         delegate: SliverChildListDelegate(
           [
-            _makeSliderImage(),
-            _sellerSimpleInfo(),
+            _makeImageSlider(),
+            _sellerInfo(),
             _line(),
             _contentDetail(),
             _line(),
@@ -274,7 +287,7 @@ class _DetailContentViewState extends State<DetailContentView>
           //   ),
           // ),
           Container(
-            margin: const EdgeInsets.only(left: 15, right: 10),
+            margin: const EdgeInsets.only(left: 10, right: 10),
             height: 40,
             width: 1,
             color: Colors.grey.withOpacity(0.3),
@@ -296,19 +309,92 @@ class _DetailContentViewState extends State<DetailContentView>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 7),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    color: const Color.fromARGB(255, 132, 206, 243),
+                Padding(
+                  padding: const EdgeInsets.all(2.0),
+                  child: GestureDetector(
+                    onTap: () async {
+                      print('${widget.data}');
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            contentPadding:
+                                const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0)),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "${widget.data["phoneNum"]}",
+                                ),
+                              ],
+                            ),
+                            actions: <Widget>[
+                              Center(
+                                child: SizedBox(
+                                  width: 250,
+                                  child: ElevatedButton(
+                                    child: const Text("확인"),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 7),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: const Color.fromARGB(255, 132, 206, 243),
+                      ),
+                      child: const Text(
+                        "연락처",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
                   ),
-                  child: const Text(
-                    "연락처",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      fontSize: 16,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(2.0),
+                  child: GestureDetector(
+                    onTap: () async {
+                      print(widget.data);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PIN(
+                                  data: widget.data,
+                                )),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 7),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: const Color.fromARGB(255, 132, 206, 243),
+                      ),
+                      child: const Text(
+                        "PIN 설정 / 해제",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
                     ),
                   ),
                 ),

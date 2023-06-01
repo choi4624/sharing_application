@@ -7,12 +7,9 @@ import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:geolocator/geolocator.dart';
 // ignore: unused_import
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:snapping_sheet/snapping_sheet.dart';
 import 'package:test_project/repository/contents_repository.dart';
-
-import 'detail.dart';
 
 class MapView extends StatefulWidget {
   const MapView({Key? key}) : super(key: key);
@@ -22,24 +19,15 @@ class MapView extends StatefulWidget {
 }
 
 class _MapViewState extends State<MapView> {
-  final oCcy = NumberFormat(
-    "#,###",
-    "ko_KR",
-  );
-  String calcStringToWon(String priceString) {
-    return "${oCcy.format(int.parse(priceString))}원";
+  Future<Map<String, dynamic>> _loadContents() async {
+    return ContentsRepository().loadRepeaterFromLocation();
   }
 
-  late String currentLocation = "sell";
-  Future<List<Map<String, dynamic>>> _loadContents() async {
-    List<Map<String, dynamic>> responseData =
-        await ContentsRepository().loadContentsFromLocation(currentLocation);
-    return responseData;
-  }
-
+  SnappingSheetController snappingSheetController = SnappingSheetController();
   @override
   void initState() {
     super.initState();
+    snappingSheetController = SnappingSheetController();
     _getCurrentLocation();
   }
 
@@ -59,16 +47,8 @@ class _MapViewState extends State<MapView> {
   }
 
   // 마커
-  final marker1 =
-      NMarker(id: '1', position: const NLatLng(37.5666102, 126.9783881));
-  //final marker2 = NMarker(id: '2', position: NLatLng(latitude, longitude));
-
-  // late List marker = [];
-  // void makeMaker() {
-  //   for (int i = 0; i < ContentsRepository().datas.length; i++) {
-  //     marker[i] = ContentsRepository().datas[i]["imageList"];
-  //   }
-  // }
+  final kyonggiUniRepeater =
+      NMarker(id: '1', position: const NLatLng(37.3, 127.0347399));
 
   Future<void> _getCurrentLocation() async {
     final position = await Geolocator.getCurrentPosition();
@@ -111,38 +91,56 @@ class _MapViewState extends State<MapView> {
     }
   }
 
-  // 가는길 검색 테스트
-  Future<void> _direction15Test(String address) async {
+  Future<void> _goToRepeaterAddress(String address) async {
     const apiKey = "6AWAOaVaaf3gncmk0OMxo6dGW7xBfco7Yf2ZfPTR";
-    // final encodedAddress = Uri.encodeComponent(address);
-    const apiUrl =
-        "https://naveropenapi.apigw.ntruss.com/map-direction-15/v1/driving";
+    final encodedAddress = Uri.encodeComponent(address);
+    final apiUrl =
+        "https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=$encodedAddress";
     final headers = {
       "X-NCP-APIGW-API-KEY-ID": apiKey,
       "X-NCP-APIGW-API-KEY": apiKey
     };
+    try {
+      final response = await http.get(Uri.parse(apiUrl), headers: headers);
+      final jsonResult = jsonDecode(response.body);
+      final addresses = jsonResult["addresses"];
+      final first = addresses[0];
+      final latitude = double.parse(first["y"]);
+      final longitude = double.parse(first["x"]);
+      _controller.updateCamera(
+        NCameraUpdate.fromCameraPosition(
+          NCameraPosition(
+            target: NLatLng(latitude, longitude),
+            zoom: 15,
+          ),
+        ),
+      );
+      print(jsonResult);
+      setState(() {
+        _locationData = null;
+        _locationText = "($latitude, $longitude)";
+      });
+    } catch (e) {
+      print("Error: $e");
+    }
   }
 
-  Widget _makeDataList(List<Map<String, dynamic>>? datas) {
-    int size = datas == null ? 0 : datas.length;
+  Widget _makeDataList(Map<String, dynamic>? datas) {
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       itemBuilder: (BuildContext context, int index) {
-        if (datas[index]["image"].isEmpty) {
-          datas[index]["image"] = [
-            "https://png.pngtree.com/png-vector/20190820/ourlarge/pngtree-no-image-vector-illustration-isolated-png-image_1694547.jpg"
-          ];
-        }
         return GestureDetector(
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (BuildContext context) {
-                  return DetailContentView(data: datas[index]);
-                },
-              ),
-            );
+            _goToAddress(datas['location']).then((_) {
+              snappingSheetController.snapToPosition(
+                const SnappingPosition.factor(
+                  positionFactor: 0.053,
+                  snappingCurve: Curves.bounceOut,
+                  snappingDuration: Duration(seconds: 1),
+                  grabbingContentOffset: GrabbingContentOffset.bottom,
+                ),
+              );
+            });
           },
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 10),
@@ -152,8 +150,9 @@ class _MapViewState extends State<MapView> {
                   borderRadius: const BorderRadius.all(
                     Radius.circular(10),
                   ),
-                  child: Image.network(
-                    datas[index]["image"][0],
+                  child: Image.asset(
+                    'assets/images/No_image.jpg',
+                    //datas["image"],
                     width: 100,
                     height: 100,
                     scale: 0.1,
@@ -168,7 +167,7 @@ class _MapViewState extends State<MapView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          datas[index]["boardTitle"]!,
+                          datas!["title"]!,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             fontSize: 15,
@@ -178,7 +177,7 @@ class _MapViewState extends State<MapView> {
                           height: 5,
                         ),
                         Text(
-                          datas[index]["location"]!,
+                          datas["location"]!,
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.black.withOpacity(0.3),
@@ -187,12 +186,6 @@ class _MapViewState extends State<MapView> {
                         const SizedBox(
                           height: 5,
                         ),
-                        Text(
-                          calcStringToWon(datas[index]["price"].toString()),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
                         const SizedBox(
                           height: 5,
                         ),
@@ -200,23 +193,9 @@ class _MapViewState extends State<MapView> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              const Icon(
-                                Icons.remove_red_eye_outlined,
-                                color: Color.fromARGB(255, 64, 64, 64),
-                                size: 17,
-                              ),
-                              // SvgPicture.asset(
-                              //   "assets/svg/heart_off.svg",
-                              //   width: 13,
-                              //   height: 13,
-                              // ),
-                              const SizedBox(
+                            children: const [
+                              SizedBox(
                                 width: 5,
-                              ),
-                              Text(
-                                //datas[index]["like"].toString(),
-                                datas[index]["boardHits"].toString(),
                               ),
                             ],
                           ),
@@ -230,7 +209,7 @@ class _MapViewState extends State<MapView> {
           ),
         );
       },
-      itemCount: datas!.length, // 상품 목록의 개수
+      itemCount: 1, // 상품 목록의 개수
       separatorBuilder: (BuildContext context, int index) {
         return Container(
           height: 1,
@@ -260,6 +239,7 @@ class _MapViewState extends State<MapView> {
 
   PreferredSizeWidget _appbarWidget() {
     return AppBar(
+      leading: null,
       title: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(30),
@@ -285,6 +265,7 @@ class _MapViewState extends State<MapView> {
 
   Widget _bodyWidget() {
     return SnappingSheet(
+      controller: snappingSheetController,
       grabbingHeight: 40,
       grabbing: Container(
         height: 56,
@@ -297,7 +278,7 @@ class _MapViewState extends State<MapView> {
         draggable: true,
         child: Container(
           height: 56,
-          color: Colors.grey[300],
+          color: Colors.white,
           alignment: Alignment.center,
           child: _productList(),
         ),
@@ -324,15 +305,13 @@ class _MapViewState extends State<MapView> {
       child: NaverMap(
         onMapReady: (controller) {
           _controller = controller;
-          _controller.addOverlay(marker1);
+          _controller.addOverlay(kyonggiUniRepeater);
         },
         options: NaverMapViewOptions(
           initialCameraPosition: NCameraPosition(
             target: _initialPosition,
             zoom: 16,
           ),
-          // minZoom: 10,
-          // maxZoom: 16,
           maxTilt: 30,
           symbolScale: 1,
           locationButtonEnable: true,

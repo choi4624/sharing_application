@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:test_project/page/chat.dart';
 //import 'package:test_project/page/image.dart';
 import 'package:test_project/page/home.dart';
 import 'package:test_project/page/mapview.dart';
@@ -26,10 +25,6 @@ class _ControlState extends State<Control> {
         return const Write();
       case 2:
         return const MapView();
-      case 3:
-        return const Chat();
-      // case 4:
-      //   return const User();
       default:
         return Home();
     }
@@ -50,7 +45,7 @@ class _ControlState extends State<Control> {
         child: SvgPicture.asset(
           "assets/svg/${iconName}_on.svg",
           width: 22,
-          color: Colors.black,
+          color: const Color.fromARGB(255, 132, 206, 243),
         ),
       ),
       label: label,
@@ -69,14 +64,15 @@ class _ControlState extends State<Control> {
         });
       },
       currentIndex: _currentPageIndex,
-      selectedItemColor: Colors.black,
+      selectedItemColor: const Color.fromARGB(255, 132, 206, 243),
       selectedFontSize: 12,
-      selectedLabelStyle: const TextStyle(color: Colors.black),
+      selectedLabelStyle: const TextStyle(
+        color: Color.fromARGB(255, 132, 206, 243),
+      ),
       items: [
         _bottomNavigationBarItem("home", "홈"),
         _bottomNavigationBarItem("notes", "글 작성"),
         _bottomNavigationBarItem("location", "지도"),
-        _bottomNavigationBarItem("chat", "중계기"),
         //_bottomNavigationBarItem("user", "사용자"),
       ],
     );

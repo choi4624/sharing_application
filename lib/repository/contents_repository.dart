@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 
 class UserInfo {
   static late String userId;
-  late String name = "홍길동";
+  //late String name = "홍길동";
   late String password;
   static late String jwt;
 
@@ -21,6 +21,13 @@ class ContentsRepository {
   Map<String, dynamic> originBoardDatas = {};
   //게시글 구현을 위한 변환 데이터를 저장할 변수
   Map<String, List<Map<String, dynamic>>> mainBoardDatas = {};
+  Map<String, List<Map<String, dynamic>>> recentmainBoardDatas = {};
+  // 중계기 위치를 나타나낸 변수
+  Map<String, dynamic> repeaterLocation = {
+    'image': '',
+    'title': '경기대학교 중계기',
+    'location': '경기도 수원시 영통구 광교산로 154-42',
+  };
   // 서버에서 게시글 데이터를 불러오는 함수
   Future<Map<String, dynamic>> loadData() async {
     var uri = Uri.parse('https://ubuntu.i4624.tk/api/v1/post/list');
@@ -47,6 +54,7 @@ class ContentsRepository {
     try {
       originBoardDatas = await loadData();
       convertData(originBoardDatas);
+      //print(originBoardDatas);
       print(mainBoardDatas);
     } catch (e) {
       print('Failed to load data: $e');
@@ -54,16 +62,21 @@ class ContentsRepository {
     return originBoardDatas;
   }
 
-  // datas를 mainDatas로 변환시키는 함수
+// datas를 mainDatas로 변환시키는 함수
   Map<String, List<Map<String, dynamic>>> convertData(
       Map<String, dynamic> datas) {
-    for (var data in datas['postResponses']) {
+    List<Map<String, dynamic>> postResponses =
+        List<Map<String, dynamic>>.from(datas['postResponses']);
+    postResponses.sort((a, b) => b['postid'].compareTo(a['postid']));
+
+    for (var data in postResponses) {
       var category = data['boardCategory'];
       var productCategory = data['itemCategory'];
       var imageList = data['imageList'];
-      // 변환된 productCategory 값에 따라 카테고리를 설정
       var convertedProductCategory = '';
       var content = '';
+
+      // 변환된 productCategory 값에 따라 카테고리를 설정
       if (productCategory == 'electronics') {
         convertedProductCategory = '디지털/전자';
       } else if (productCategory == 'tools') {
@@ -75,17 +88,26 @@ class ContentsRepository {
       } else {
         convertedProductCategory = data['itemCategory'];
       }
+
       var imageUrls = imageList
           .map((imageId) =>
               'https://ubuntu.i4624.tk/image/imageid/${imageId['urid']}')
           .toList();
-      //imageUrls ??= 'https://ubuntu.i4624.tk/image/imageid/3';
+
       if (data['content'] == null) {
         content = '내용이 없음';
       } else {
         content = data['content'];
       }
+
+      var phoneNumber = data['phone'] as String;
+      phoneNumber = phoneNumber
+          .replaceFirstMapped(RegExp(r'^(\d{3})(\d{4})(\d{4})$'), (match) {
+        return '${match[1]}-${match[2]}-${match[3]}';
+      });
+
       var convertedData = {
+        'postId': data['postid'],
         'username': data['username'],
         'title': data['title'],
         'location': data['location'],
@@ -93,240 +115,30 @@ class ContentsRepository {
         'content': content,
         'imageList': imageUrls,
         'itemCategory': convertedProductCategory,
+        'phoneNum': phoneNumber,
       };
+
       if (mainBoardDatas.containsKey(category)) {
         mainBoardDatas[category]!.add(convertedData);
       } else {
         mainBoardDatas[category] = [convertedData];
       }
     }
-    print(datas['imageList']);
+
     return mainBoardDatas;
   }
 
-  //========================= 테스트 데이터 ================================
-  // List<Map<String, dynamic>> data = [
-  //   {
-  //     "username": "rkskek12",
-  //     "title": "11111",
-  //     "location": "ㅇㅇㅇ ㅇㅇㅇ ㅇㅇㅇ",
-  //     "price": "2000",
-  //     "content": 'dsadsad',
-  //     "imageList": [100095, 100095],
-  //     "category": "sell",
-  //     "productCategory": "electronics",
-  //   },
-  //   {
-  //     "username": "rkskek12",
-  //     "title": "11111",
-  //     "location": "ㅇㅇㅇ ㅇㅇㅇ ㅇㅇㅇ",
-  //     "price": "2000",
-  //     "content": 'dsadsad',
-  //     "imageList": [100095, 100095],
-  //     "category": "sell",
-  //     "productCategory": "electronics",
-  //   },
-  //   {
-  //     "username": "rkskek12",
-  //     "title": "11111",
-  //     "location": "ㅇㅇㅇ ㅇㅇㅇ ㅇㅇㅇ",
-  //     "price": "2000",
-  //     "content": 'dsadsad',
-  //     "imageList": [100095, 100095],
-  //     "category": "sell",
-  //     "productCategory": "electronics",
-  //   },
-  //   {
-  //     "username": "rkskek12",
-  //     "title": "11111",
-  //     "location": "ㅇㅇㅇ ㅇㅇㅇ ㅇㅇㅇ",
-  //     "price": "2000",
-  //     "content": 'dsadsad',
-  //     "imageList": [100095, 100095],
-  //     "category": "buy",
-  //     "productCategory": "electronics",
-  //   },
-  //   {
-  //     "username": "rkskek12",
-  //     "title": "11111",
-  //     "location": "ㅇㅇㅇ ㅇㅇㅇ ㅇㅇㅇ",
-  //     "price": "2000",
-  //     "content": 'dsadsad',
-  //     "imageList": [100095, 100095],
-  //     "category": "buy",
-  //     "productCategory": "electronics",
-  //   },
-  //   {
-  //     "username": "rkskek12",
-  //     "title": "11111",
-  //     "location": "ㅇㅇㅇ ㅇㅇㅇ ㅇㅇㅇ",
-  //     "price": "2000",
-  //     "content": 'dsadsad',
-  //     "imageList": [100095, 100095],
-  //     "category": "buy",
-  //     "productCategory": "electronics",
-  //   },
-  //   {
-  //     "username": "rkskek12",
-  //     "title": "11111",
-  //     "location": "ㅇㅇㅇ ㅇㅇㅇ ㅇㅇㅇ",
-  //     "price": "2000",
-  //     "content": 'dsadsad',
-  //     "imageList": [100095, 100095],
-  //     "category": "rental",
-  //     "productCategory": "electronics",
-  //   },
-  //   {
-  //     "username": "rkskek12",
-  //     "title": "11111",
-  //     "location": "ㅇㅇㅇ ㅇㅇㅇ ㅇㅇㅇ",
-  //     "price": "2000",
-  //     "content": 'dsadsad',
-  //     "imageList": [100095, 100095],
-  //     "category": "rental",
-  //     "productCategory": "electronics",
-  //   },
-  //   {
-  //     "username": "rkskek12",
-  //     "title": "11111",
-  //     "location": "ㅇㅇㅇ ㅇㅇㅇ ㅇㅇㅇ",
-  //     "price": "2000",
-  //     "content": 'dsadsad',
-  //     "imageList": [100095, 100095],
-  //     "category": "rental",
-  //     "productCategory": "electronics",
-  //   },
-  //   {
-  //     "username": "rkskek12",
-  //     "title": "11111",
-  //     "location": "ㅇㅇㅇ ㅇㅇㅇ ㅇㅇㅇ",
-  //     "price": "2000",
-  //     "content": 'dsadsad',
-  //     "imageList": [100095, 100095],
-  //     "category": "rental",
-  //     "productCategory": "electronics",
-  //   },
-  // ];
-  // Map<String, dynamic> datas = {
-  //   "sell": [
-  //     {
-  //       "username": "rkskek12",
-  //       "title": "11111",
-  //       "location": "ㅇㅇㅇ ㅇㅇㅇ ㅇㅇㅇ",
-  //       "price": "2000",
-  //       "content": 'dsadsad',
-  //       "imageList": [
-  //         // 'https://ubuntu.i4624.tk/image/imageid/100095',
-  //         // 'https://ubuntu.i4624.tk/image/imageid/100095'
-  //       ],
-  //       "productCategory": "디지털/가전",
-  //     },
-  //     {
-  //       "username": "rkskek12",
-  //       "title": "11111",
-  //       "location": "ㅇㅇㅇ ㅇㅇㅇ ㅇㅇㅇ",
-  //       "price": "2000",
-  //       "content": 'dsadsad',
-  //       "imageList": [
-  //         'assets/images/No_image.jpg',
-  //         'https://ubuntu.i4624.tk/image/imageid/100095'
-  //       ],
-  //       "productCategory": "디지털/가전",
-  //     },
-  //     {
-  //       "username": "rkskek12",
-  //       "title": "11111",
-  //       "location": "ㅇㅇㅇ ㅇㅇㅇ ㅇㅇㅇ",
-  //       "price": "2000",
-  //       "content": 'dsadsad',
-  //       "imageList": [
-  //         'https://ubuntu.i4624.tk/image/imageid/100095',
-  //         'https://ubuntu.i4624.tk/image/imageid/100095'
-  //       ],
-  //       "productCategory": "디지털/가전",
-  //     },
-  //   ],
-  //   "buy": [
-  //     {
-  //       "username": "rkskek12",
-  //       "title": "11111",
-  //       "location": "ㅇㅇㅇ ㅇㅇㅇ ㅇㅇㅇ",
-  //       "price": "2000",
-  //       "content": 'dsadsad',
-  //       "imageList": [
-  //         'https://ubuntu.i4624.tk/image/imageid/100095',
-  //         'https://ubuntu.i4624.tk/image/imageid/100095'
-  //       ],
-  //       "productCategory": "디지털/가전",
-  //     },
-  //     {
-  //       "username": "rkskek12",
-  //       "title": "11111",
-  //       "location": "ㅇㅇㅇ ㅇㅇㅇ ㅇㅇㅇ",
-  //       "price": "2000",
-  //       "content": 'dsadsad',
-  //       "imageList": [
-  //         'https://ubuntu.i4624.tk/image/imageid/100095',
-  //         'https://ubuntu.i4624.tk/image/imageid/100095'
-  //       ],
-  //       "productCategory": "디지털/가전",
-  //     },
-  //     {
-  //       "username": "rkskek12",
-  //       "title": "11111",
-  //       "location": "ㅇㅇㅇ ㅇㅇㅇ ㅇㅇㅇ",
-  //       "price": "2000",
-  //       "content": 'dsadsad',
-  //       "imageList": [
-  //         'https://ubuntu.i4624.tk/image/imageid/100095',
-  //         'https://ubuntu.i4624.tk/image/imageid/100095'
-  //       ],
-  //       "productCategory": "디지털/가전",
-  //     },
-  //   ],
-  //   "rental": [
-  //     {
-  //       "username": "rkskek12",
-  //       "title": "11111",
-  //       "location": "ㅇㅇㅇ ㅇㅇㅇ ㅇㅇㅇ",
-  //       "price": "2000",
-  //       "content": 'dsadsad',
-  //       "imageList": [
-  //         'https://ubuntu.i4624.tk/image/imageid/100095',
-  //         'https://ubuntu.i4624.tk/image/imageid/100095'
-  //       ],
-  //       "productCategory": "디지털/가전",
-  //     },
-  //     {
-  //       "username": "rkskek12",
-  //       "title": "11111",
-  //       "location": "ㅇㅇㅇ ㅇㅇㅇ ㅇㅇㅇ",
-  //       "price": "2000",
-  //       "content": 'dsadsad',
-  //       "imageList": [
-  //         'https://ubuntu.i4624.tk/image/imageid/100095',
-  //         'https://ubuntu.i4624.tk/image/imageid/100095'
-  //       ],
-  //       "productCategory": "디지털/가전",
-  //     },
-  //     {
-  //       "username": "rkskek12",
-  //       "title": "11111",
-  //       "location": "ㅇㅇㅇ ㅇㅇㅇ ㅇㅇㅇ",
-  //       "price": "2000",
-  //       "content": 'dsadsad',
-  //       "imageList": [
-  //         'https://ubuntu.i4624.tk/image/imageid/100095',
-  //         'https://ubuntu.i4624.tk/image/imageid/100095'
-  //       ],
-  //       "productCategory": "디지털/가전",
-  //     },
-  //   ]
-  // };
-  //========================= 테스트 데이터 ================================
+  Map<String, List<Map<String, dynamic>>> convertRecentData() {
+    return recentmainBoardDatas;
+  }
+
   Future<List<Map<String, dynamic>>> loadContentsFromLocation(
       String location) async {
     await loadBoradData();
     return mainBoardDatas[location]!;
+  }
+
+  Future<Map<String, dynamic>> loadRepeaterFromLocation() async {
+    return repeaterLocation;
   }
 }
