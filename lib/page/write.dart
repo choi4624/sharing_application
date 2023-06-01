@@ -61,18 +61,6 @@ class _WriteState extends State<Write> {
     "rental": "대여",
   };
 
-  // textfield에서 입력받은 데이터를 변수에 저장하는 함수
-  Future<void> _saveData({required String userId}) async {
-    userId = userId;
-    userNickName = UserInfo().name;
-    title = _titleController.text;
-    contents = _contentsController.text; // 카테고리
-    productCategory = productCategoryCurrentLocation;
-    category = categoryCurrentLocation; //거래방식
-    location = _locationController.text;
-    price = int.parse(_priceController.text.replaceAll(',', ''));
-  }
-
   // 사용자의 다수의 image를 받기위한 생성자
   final ImagePicker _picker = ImagePicker();
   Future<void> _selectImages() async {
@@ -84,13 +72,14 @@ class _WriteState extends State<Write> {
         if (selectedImages.isNotEmpty) {
           _selectedFiles.addAll(selectedImages);
         } else {
-          print('no image select');
+          //print('no image select');
         }
       });
     } catch (e) {
-      print(e);
+      //print(e);
+      throw Exception(e);
     }
-    print("Image List length: ${_selectedFiles.length.toString()}");
+    //print("Image List length: ${_selectedFiles.length.toString()}");
   }
 
   List<Map<String, dynamic>> imageData = [];
@@ -179,10 +168,10 @@ class _WriteState extends State<Write> {
         )
         .timeout(const Duration(seconds: 5));
     if (response.statusCode == 200) {
-      print(response.statusCode);
+      //print(response.statusCode);
     } else {
-      print(response.statusCode);
-      print(response.reasonPhrase);
+      // print(response.statusCode);
+      // print(response.reasonPhrase);
       throw Exception('Failed to send total data');
     }
   }
@@ -190,32 +179,32 @@ class _WriteState extends State<Write> {
   // Appbar Widget
   PreferredSizeWidget _appbarWidget() {
     return AppBar(
-      backgroundColor: Colors.white,
+      leading: IconButton(
+        icon: const Icon(Icons.close),
+        color: Colors.black,
+        padding: EdgeInsets.zero,
+        onPressed: () {
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const Control()),
+          );
+        },
+        constraints: const BoxConstraints(),
+        splashRadius: 24,
+        iconSize: 24,
+        // 아래의 ButtonStyle 추가
+        style: ButtonStyle(
+          minimumSize: MaterialStateProperty.all(Size.zero),
+          padding: MaterialStateProperty.all(EdgeInsets.zero),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+      ),
+      backgroundColor: const Color.fromARGB(255, 192, 234, 255),
       elevation: 1,
       title: Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.close),
-            color: Colors.black,
-            padding: EdgeInsets.zero,
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Control()),
-              );
-            },
-            constraints: const BoxConstraints(),
-            splashRadius: 24,
-            iconSize: 24,
-            // 아래의 ButtonStyle 추가
-            style: ButtonStyle(
-              minimumSize: MaterialStateProperty.all(Size.zero),
-              padding: MaterialStateProperty.all(EdgeInsets.zero),
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-          ),
-          const Expanded(
+        children: const [
+          Expanded(
             child: Center(
               child: Text(
                 "게시글 작성",
@@ -226,335 +215,351 @@ class _WriteState extends State<Write> {
               ),
             ),
           ),
-          TextButton(
-            style: ButtonStyle(
-              minimumSize: MaterialStateProperty.all(Size.zero),
-              padding: MaterialStateProperty.all(EdgeInsets.zero),
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              overlayColor: MaterialStateColor.resolveWith(
-                  (states) => Colors.transparent),
-              backgroundColor: MaterialStateColor.resolveWith(
-                  (states) => Colors.transparent),
-              foregroundColor: MaterialStateColor.resolveWith((states) =>
-                  states.contains(MaterialState.pressed)
-                      ? Colors.blue
-                      : Colors.black),
-            ),
-            onPressed: () async {
-              //거래방식 정보가 비어있을 때
-              if (categoryCurrentLocation == "default") {
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      contentPadding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0)),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: const [
-                          Text(
-                            "거래방식을 입력해주세요",
-                          ),
-                        ],
-                      ),
-                      actions: <Widget>[
-                        Center(
-                          child: SizedBox(
-                            width: 250,
-                            child: ElevatedButton(
-                              style: ButtonStyle(
-                                backgroundColor: MaterialStateColor.resolveWith(
-                                  (states) {
-                                    if (states
-                                        .contains(MaterialState.disabled)) {
-                                      return Colors.grey;
-                                    } else {
-                                      return Colors.blue;
-                                    }
-                                  },
-                                ),
-                              ),
-                              child: const Text("확인"),
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              }
-              // 카테고리 정보가 비어있을 때
-              else if (productCategoryCurrentLocation == "default") {
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      contentPadding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0)),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: const [
-                          Text(
-                            "카테고리를 입력해주세요",
-                          ),
-                        ],
-                      ),
-                      actions: <Widget>[
-                        Center(
-                          child: SizedBox(
-                            width: 250,
-                            child: ElevatedButton(
-                              style: ButtonStyle(
-                                backgroundColor: MaterialStateColor.resolveWith(
-                                  (states) {
-                                    if (states
-                                        .contains(MaterialState.disabled)) {
-                                      return Colors.grey;
-                                    } else {
-                                      return Colors.blue;
-                                    }
-                                  },
-                                ),
-                              ),
-                              child: const Text("확인"),
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              }
-              // 제목 정보가 비어있을 때
-              else if (_titleController.text.isEmpty) {
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      contentPadding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0)),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: const [
-                          Text(
-                            "제목을 입력해주세요",
-                          ),
-                        ],
-                      ),
-                      actions: <Widget>[
-                        Center(
-                          child: SizedBox(
-                            width: 250,
-                            child: ElevatedButton(
-                              style: ButtonStyle(
-                                backgroundColor: MaterialStateColor.resolveWith(
-                                  (states) {
-                                    if (states
-                                        .contains(MaterialState.disabled)) {
-                                      return Colors.grey;
-                                    } else {
-                                      return Colors.blue;
-                                    }
-                                  },
-                                ),
-                              ),
-                              child: const Text("확인"),
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              }
-              // 지역 정보가 비어있을 때
-              else if (_locationController.text.isEmpty) {
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      contentPadding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0)),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: const [
-                          Text(
-                            "주소를 입력해주세요",
-                          ),
-                        ],
-                      ),
-                      actions: <Widget>[
-                        Center(
-                          child: SizedBox(
-                            width: 250,
-                            child: ElevatedButton(
-                              child: const Text("확인"),
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              }
-              // 가격 정보가 비어있을 때
-              else if (_priceController.text.isEmpty) {
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      contentPadding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0)),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: const [
-                          Text(
-                            "가격을 입력해주세요",
-                          ),
-                        ],
-                      ),
-                      actions: <Widget>[
-                        Center(
-                          child: SizedBox(
-                            width: 250,
-                            child: ElevatedButton(
-                              child: const Text("확인"),
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              }
-              // 내용 정보가 비어있을 때
-              else if (_contentsController.text.isEmpty) {
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      contentPadding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0)),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: const [
-                          Text(
-                            "내용을 입력해주세요",
-                          ),
-                        ],
-                      ),
-                      actions: <Widget>[
-                        Center(
-                          child: SizedBox(
-                            width: 250,
-                            child: ElevatedButton(
-                              child: const Text("확인"),
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              }
-              // else if (_selectedFiles.isEmpty) {
-              //   showDialog(
-              //     context: context,
-              //     barrierDismissible: false,
-              //     builder: (BuildContext context) {
-              //       return AlertDialog(
-              //         contentPadding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
-              //         shape: RoundedRectangleBorder(
-              //             borderRadius: BorderRadius.circular(10.0)),
-              //         content: Column(
-              //           mainAxisSize: MainAxisSize.min,
-              //           crossAxisAlignment: CrossAxisAlignment.center,
-              //           children: const [
-              //             Text(
-              //               "사진을 첨부해주세요",
-              //             ),
-              //           ],
-              //         ),
-              //         actions: <Widget>[
-              //           Center(
-              //             child: SizedBox(
-              //               width: 250,
-              //               child: ElevatedButton(
-              //                 child: const Text("확인"),
-              //                 onPressed: () {
-              //                   Navigator.pop(context);
-              //                 },
-              //               ),
-              //             ),
-              //           ),
-              //         ],
-              //       );
-              //     },
-              //   );
-              // }
-              // 모든 정보가 입력되었을 때
-              else {
-                _sendDataToServer(
-                    user: UserInfo(),
-                    userId: UserInfo.userId,
-                    title: _titleController.text,
-                    contents: _contentsController.text,
-                    productCategory: productCategoryCurrentLocation,
-                    category: categoryCurrentLocation,
-                    location: _locationController.text,
-                    price:
-                        int.parse(_priceController.text.replaceAll(',', '')));
-                print("데이터 전송");
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Control()),
-                );
-              }
-            },
-            child: const Text(
-              "완료",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-            ),
-          ),
         ],
       ),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: SizedBox(
+            child: TextButton(
+              style: ButtonStyle(
+                minimumSize: MaterialStateProperty.all(Size.zero),
+                padding: MaterialStateProperty.all(EdgeInsets.zero),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                overlayColor: MaterialStateColor.resolveWith(
+                    (states) => Colors.transparent),
+                backgroundColor: MaterialStateColor.resolveWith(
+                    (states) => Colors.transparent),
+                foregroundColor: MaterialStateColor.resolveWith((states) =>
+                    states.contains(MaterialState.pressed)
+                        ? const Color.fromARGB(255, 132, 206, 243)
+                        : Colors.black),
+              ),
+              onPressed: () async {
+                //거래방식 정보가 비어있을 때
+                if (categoryCurrentLocation == "default") {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        contentPadding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0)),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: const [
+                            Text(
+                              "거래방식을 입력해주세요",
+                            ),
+                          ],
+                        ),
+                        actions: <Widget>[
+                          Center(
+                            child: SizedBox(
+                              width: 250,
+                              child: ElevatedButton(
+                                style: ButtonStyle(
+                                  backgroundColor:
+                                      MaterialStateColor.resolveWith(
+                                    (states) {
+                                      if (states
+                                          .contains(MaterialState.disabled)) {
+                                        return Colors.grey;
+                                      } else {
+                                        return const Color.fromARGB(
+                                            255, 132, 206, 243);
+                                      }
+                                    },
+                                  ),
+                                ),
+                                child: const Text("확인"),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+                // 카테고리 정보가 비어있을 때
+                else if (productCategoryCurrentLocation == "default") {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        contentPadding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0)),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: const [
+                            Text(
+                              "카테고리를 입력해주세요",
+                            ),
+                          ],
+                        ),
+                        actions: <Widget>[
+                          Center(
+                            child: SizedBox(
+                              width: 250,
+                              child: ElevatedButton(
+                                style: ButtonStyle(
+                                  backgroundColor:
+                                      MaterialStateColor.resolveWith(
+                                    (states) {
+                                      if (states
+                                          .contains(MaterialState.disabled)) {
+                                        return Colors.grey;
+                                      } else {
+                                        return const Color.fromARGB(
+                                            255, 132, 206, 243);
+                                      }
+                                    },
+                                  ),
+                                ),
+                                child: const Text(
+                                  "확인",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+                // 제목 정보가 비어있을 때
+                else if (_titleController.text.isEmpty) {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        contentPadding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0)),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: const [
+                            Text(
+                              "제목을 입력해주세요",
+                            ),
+                          ],
+                        ),
+                        actions: <Widget>[
+                          SizedBox(
+                            width: 250,
+                            child: ElevatedButton(
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateColor.resolveWith(
+                                  (states) {
+                                    if (states
+                                        .contains(MaterialState.disabled)) {
+                                      return Colors.grey;
+                                    } else {
+                                      return Colors.blue;
+                                    }
+                                  },
+                                ),
+                              ),
+                              child: const Text("확인"),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+                // 지역 정보가 비어있을 때
+                else if (_locationController.text.isEmpty) {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        contentPadding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0)),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: const [
+                            Text(
+                              "주소를 입력해주세요",
+                            ),
+                          ],
+                        ),
+                        actions: <Widget>[
+                          Center(
+                            child: SizedBox(
+                              width: 250,
+                              child: ElevatedButton(
+                                child: const Text("확인"),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+                // 가격 정보가 비어있을 때
+                else if (_priceController.text.isEmpty) {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        contentPadding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0)),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: const [
+                            Text(
+                              "가격을 입력해주세요",
+                            ),
+                          ],
+                        ),
+                        actions: <Widget>[
+                          Center(
+                            child: SizedBox(
+                              width: 250,
+                              child: ElevatedButton(
+                                child: const Text("확인"),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+                // 내용 정보가 비어있을 때
+                else if (_contentsController.text.isEmpty) {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        contentPadding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0)),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: const [
+                            Text(
+                              "내용을 입력해주세요",
+                            ),
+                          ],
+                        ),
+                        actions: <Widget>[
+                          Center(
+                            child: SizedBox(
+                              width: 250,
+                              child: ElevatedButton(
+                                child: const Text("확인"),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                } else if (_selectedFiles.isEmpty) {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        contentPadding: const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0)),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: const [
+                            Text(
+                              "사진을 첨부해주세요",
+                            ),
+                          ],
+                        ),
+                        actions: <Widget>[
+                          Center(
+                            child: SizedBox(
+                              width: 250,
+                              child: ElevatedButton(
+                                child: const Text("확인"),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+                // 모든 정보가 입력되었을 때
+                else {
+                  _sendDataToServer(
+                      user: UserInfo(),
+                      userId: UserInfo.userId,
+                      title: _titleController.text,
+                      contents: _contentsController.text,
+                      productCategory: productCategoryCurrentLocation,
+                      category: categoryCurrentLocation,
+                      location: _locationController.text,
+                      price:
+                          int.parse(_priceController.text.replaceAll(',', '')));
+                  //print("데이터 전송");
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Control()),
+                  );
+                }
+              },
+              child: const Text(
+                "완료",
+                style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -576,9 +581,7 @@ class _WriteState extends State<Write> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(40, 20, 0, 10),
                   child: GestureDetector(
-                    onTap: () {
-                      print("click event");
-                    },
+                    onTap: () {},
                     child: PopupMenuButton<String>(
                       offset: const Offset(0, 30),
                       shape: ShapeBorder.lerp(
@@ -610,7 +613,7 @@ class _WriteState extends State<Write> {
                       },
                       //좌측 상단 판매, 구매, 대여 선택바
                       child: SizedBox(
-                        width: 76,
+                        width: 90,
                         child: Row(
                           children: [
                             //앱 내에서 좌측 상단바 출력을 위한 데이터
@@ -631,9 +634,6 @@ class _WriteState extends State<Write> {
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(
-                  width: 5,
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 20, 20, 10),
@@ -727,7 +727,7 @@ class _WriteState extends State<Write> {
                     MaterialPageRoute(
                       builder: (_) => KpostalView(
                         callback: (Kpostal result) {
-                          print(result.address);
+                          //print(result.address);
                           setState(() {
                             location =
                                 result.address; // 주소를 선택하면 해당 값을 상태 변수에 저장
@@ -846,11 +846,10 @@ class _WriteState extends State<Write> {
       body: _makeTextArea(),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          print('이미지 추가');
           _selectImages();
         },
         tooltip: 'Increment',
-        backgroundColor: const Color.fromARGB(255, 200, 200, 200),
+        backgroundColor: const Color.fromARGB(255, 172, 227, 255),
         label: const Text(
           "이미지 추가",
           style: TextStyle(

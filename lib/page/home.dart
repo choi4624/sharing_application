@@ -87,9 +87,10 @@ class _HomeState extends State<Home> {
           ),
         ),
       ),
-      backgroundColor: Colors.white, //const Color.fromARGB(255, 184, 210, 255),
+      backgroundColor: const Color.fromARGB(
+          255, 192, 234, 255), //const Color.fromARGB(255, 184, 210, 255),
       elevation: 1.5, // 그림자를 표현되는 높이 3d 측면의 높이를 뜻함.
-      actions: [
+      actions: const [
         // IconButton(
         //   onPressed: () {},
         //   icon: const Icon(
@@ -97,16 +98,16 @@ class _HomeState extends State<Home> {
         //     color: Colors.black,
         //   ),
         // ),
-        Padding(
-          padding: const EdgeInsets.only(right: 10),
-          child: IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.more_vert,
-              color: Colors.black,
-            ),
-          ),
-        ),
+        // Padding(
+        //   padding: const EdgeInsets.only(right: 10),
+        //   child: IconButton(
+        //     onPressed: () {},
+        //     icon: const Icon(
+        //       Icons.more_vert,
+        //       color: Colors.black,
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }
@@ -157,11 +158,7 @@ class _HomeState extends State<Home> {
       padding: const EdgeInsets.symmetric(horizontal: 10),
       itemBuilder: (BuildContext context, int index) {
         if (datas[index]["imageList"].isEmpty) {
-          datas[index]["imageList"] = [
-            "https://storyset.com/illustration/oops-404-error-with-a-broken-robot/rafiki"
-          ];
-        if (datas[index]["image"].isEmpty) {
-          datas[index]["image"] = ["assets/images/No_image.jpg"];
+          datas[index]["imageList"] = [""];
         }
         return GestureDetector(
           onTap: () {
@@ -183,7 +180,18 @@ class _HomeState extends State<Home> {
                   borderRadius: const BorderRadius.all(
                     Radius.circular(10),
                   ),
-                  child: Image.network(
+                  child:
+                      // CachedNetworkImage(
+                      //   width: 100,
+                      //   height: 100,
+                      //   imageUrl: datas[index]["imageList"][0],
+                      //   // placeholder: Image.asset(
+                      //   //   "assets/images/No_image.jpg",
+                      //   // ),
+                      //   errorWidget: (context, url, error) =>
+                      //       const Icon(Icons.error),
+                      // ),
+                      Image.network(
                     datas[index]["imageList"][0],
                     width: 100,
                     height: 100,
@@ -195,6 +203,19 @@ class _HomeState extends State<Home> {
                         "assets/images/No_image.jpg",
                         width: 100,
                         height: 100,
+                      );
+                    },
+                    loadingBuilder: (BuildContext context, Widget child,
+                        ImageChunkEvent? loadingProgress) {
+                      if (loadingProgress == null) {
+                        return child;
+                      }
+                      return Image.asset(
+                        'assets/images/loading_placeholder.gif',
+                        width: 100,
+                        height: 100,
+                        scale: 1,
+                        fit: BoxFit.cover, // 로딩 중에 표시할 위젯
                       );
                     },
                   ),
@@ -255,26 +276,6 @@ class _HomeState extends State<Home> {
                         //     ],
                         //   ),
                         // ),
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              const Icon(
-                                Icons.remove_red_eye_outlined,
-                                color: Color.fromARGB(255, 64, 64, 64),
-                                size: 17,
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              Text(
-                                //datas[index]["like"].toString(),
-                                datas[index]["boardHits"].toString(),
-                              ),
-                            ],
-                          ),
-                        ),
                       ],
                     ),
                   ),
