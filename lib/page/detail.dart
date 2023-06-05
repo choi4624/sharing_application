@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_project/page/home.dart';
 import 'package:test_project/page/pin.dart';
 import '../repository/contents_repository.dart';
@@ -21,6 +22,7 @@ class _DetailContentViewState extends State<DetailContentView>
   late Animation _colorTween;
   late List<dynamic> imgList;
   late Size size;
+  late String username;
   int _currentPage = 0;
 
   late String currentLocation;
@@ -46,6 +48,12 @@ class _DetailContentViewState extends State<DetailContentView>
     cabinetLocation = "default";
     currentLocation = "setting";
     // _loadMyFavoriteContentState();
+  }
+
+  Future<String?> getUserId() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    username = prefs.getString('userId')!;
+    return prefs.getString('userId');
   }
 
   @override
@@ -74,7 +82,7 @@ class _DetailContentViewState extends State<DetailContentView>
     );
   }
 
-  Widget _makeImageSlider() {
+  Widget _imageSlider() {
     return SizedBox(
       height: size.width * 0.8,
       child: Stack(
@@ -241,7 +249,7 @@ class _DetailContentViewState extends State<DetailContentView>
       SliverList(
         delegate: SliverChildListDelegate(
           [
-            _makeImageSlider(),
+            _imageSlider(),
             _sellerInfo(),
             _line(),
             _contentDetail(),
@@ -260,6 +268,7 @@ class _DetailContentViewState extends State<DetailContentView>
       height: 55,
       child: Row(
         children: [
+          // 관심 목록(좋아요) 기능 -> 현재 구현 X
           // GestureDetector(
           //   onTap: () async {
           //     if (isMyFavoriteContent) {
@@ -292,6 +301,7 @@ class _DetailContentViewState extends State<DetailContentView>
             width: 1,
             color: Colors.grey.withOpacity(0.3),
           ),
+          // 가격 표기
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -309,6 +319,7 @@ class _DetailContentViewState extends State<DetailContentView>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                // 연락처 확인 버튼 -> 채팅 기능 구현 후 채팅 버튼으로 수정 예정
                 Padding(
                   padding: const EdgeInsets.all(2.0),
                   child: GestureDetector(
@@ -337,6 +348,10 @@ class _DetailContentViewState extends State<DetailContentView>
                                 child: SizedBox(
                                   width: 250,
                                   child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color.fromARGB(
+                                          255, 132, 206, 243),
+                                    ),
                                     child: const Text("확인"),
                                     onPressed: () {
                                       Navigator.pop(context);
@@ -367,11 +382,11 @@ class _DetailContentViewState extends State<DetailContentView>
                     ),
                   ),
                 ),
+                // PIN 입력 페이지 이동 버튼
                 Padding(
                   padding: const EdgeInsets.all(2.0),
                   child: GestureDetector(
                     onTap: () async {
-                      print(widget.data);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -379,6 +394,60 @@ class _DetailContentViewState extends State<DetailContentView>
                                   data: widget.data,
                                 )),
                       );
+                      // await getUserId();
+                      // if (widget.data['username'] == username) {
+                      //   // ignore: use_build_context_synchronously
+                      //   Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //         builder: (context) => PIN(
+                      //               data: widget.data,
+                      //             )),
+                      //   );
+                      // } else {
+                      //   // ignore: use_build_context_synchronously
+                      //   showDialog(
+                      //     context: context,
+                      //     barrierDismissible: false,
+                      //     builder: (BuildContext context) {
+                      //       return AlertDialog(
+                      //         contentPadding:
+                      //             const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                      //         shape: RoundedRectangleBorder(
+                      //             borderRadius: BorderRadius.circular(10.0)),
+                      //         content: Column(
+                      //           mainAxisSize: MainAxisSize.min,
+                      //           crossAxisAlignment: CrossAxisAlignment.center,
+                      //           children: const [
+                      //             Text(
+                      //               "게시글 작성자만",
+                      //             ),
+                      //             Text(
+                      //               "PIN 등록 / 해제가 가능합니다.",
+                      //             ),
+                      //           ],
+                      //         ),
+                      //         actions: <Widget>[
+                      //           Center(
+                      //             child: SizedBox(
+                      //               width: 250,
+                      //               child: ElevatedButton(
+                      //                 style: ElevatedButton.styleFrom(
+                      //                   backgroundColor: const Color.fromARGB(
+                      //                       255, 132, 206, 243),
+                      //                 ),
+                      //                 child: const Text("확인"),
+                      //                 onPressed: () {
+                      //                   Navigator.pop(context);
+                      //                 },
+                      //               ),
+                      //             ),
+                      //           ),
+                      //         ],
+                      //       );
+                      //     },
+                      //   );
+                      // }
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(

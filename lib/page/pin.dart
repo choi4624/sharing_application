@@ -17,6 +17,7 @@ class _PINState extends State<PIN> {
   late String amount = '';
   late String currentLocation;
   late String cabinetLocation;
+  late int responseStatusCode;
 
   //앱 내에서 좌측 상단바 출력을 위한 데이터
   final Map<String, String> optionsTypeToString = {
@@ -37,6 +38,7 @@ class _PINState extends State<PIN> {
     amount = '';
     cabinetLocation = "default";
     currentLocation = "setting";
+    responseStatusCode = 0;
   }
 
   PreferredSizeWidget _appbarWidget() {
@@ -143,7 +145,7 @@ class _PINState extends State<PIN> {
           (x) => Row(
             children: x.map((y) {
               return Expanded(
-                child: KeyboardKey(
+                child: NumKeyboardKey(
                   label: y,
                   onTap: y is Widget ? onBackspacePress : onNumberPress,
                   value: y,
@@ -168,7 +170,7 @@ class _PINState extends State<PIN> {
                 color: Color.fromARGB(255, 132, 204, 252),
               ),
               child: MaterialButton(
-                onPressed: () {
+                onPressed: () async {
                   if (cabinetLocation == "default") {
                     showDialog(
                       context: context,
@@ -193,6 +195,10 @@ class _PINState extends State<PIN> {
                               child: SizedBox(
                                 width: 250,
                                 child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color.fromARGB(
+                                        255, 132, 206, 243),
+                                  ),
                                   child: const Text("확인"),
                                   onPressed: () {
                                     Navigator.pop(context);
@@ -228,6 +234,10 @@ class _PINState extends State<PIN> {
                               child: SizedBox(
                                 width: 250,
                                 child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color.fromARGB(
+                                        255, 132, 206, 243),
+                                  ),
                                   child: const Text("확인"),
                                   onPressed: () {
                                     Navigator.pop(context);
@@ -240,11 +250,323 @@ class _PINState extends State<PIN> {
                       },
                     );
                   } else {
-                    _sendPINDataToServer(
-                      cabinetNum: int.parse(cabinetLocation),
-                      pinNum: int.parse(amount),
-                      postId: widget.data['postId'],
-                    );
+                    // PIN 등록(등록자)
+                    if (optionsTypeToString[currentLocation] ==
+                            optionsTypeToString["setting"] &&
+                        widget.data["username"] == UserInfo.userId) {
+                      await _sendPINDataToServer(
+                        cabinetNum: int.parse(cabinetLocation),
+                        pinNum: int.parse(amount),
+                        postId: widget.data['postId'],
+                      );
+                      if (responseStatusCode == 200) {
+                        // ignore: use_build_context_synchronously
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              contentPadding:
+                                  const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0)),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "${optionsTypeToString[currentLocation]}이 완료되었습니다.",
+                                  ),
+                                ],
+                              ),
+                              actions: <Widget>[
+                                Center(
+                                  child: SizedBox(
+                                    width: 250,
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color.fromARGB(
+                                            255, 132, 206, 243),
+                                      ),
+                                      child: const Text("확인"),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else if (responseStatusCode == 400 &&
+                          optionsTypeToString[currentLocation] ==
+                              optionsTypeToString["setting"]) {
+                        // ignore: use_build_context_synchronously
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              contentPadding:
+                                  const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0)),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "${cabinetNumberToString[cabinetLocation]}은 현재 사용중입니다.",
+                                  ),
+                                ],
+                              ),
+                              actions: <Widget>[
+                                Center(
+                                  child: SizedBox(
+                                    width: 250,
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color.fromARGB(
+                                            255, 132, 206, 243),
+                                      ),
+                                      child: const Text("확인"),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else if (responseStatusCode == 401 &&
+                          optionsTypeToString[currentLocation] ==
+                              optionsTypeToString["auth"]) {}
+                    }
+                    // PIN 해제(등록자)
+                    else if (optionsTypeToString[currentLocation] ==
+                            optionsTypeToString["auth"] &&
+                        widget.data["username"] == UserInfo.userId) {
+                      await _sendPINDataToServer(
+                        cabinetNum: int.parse(cabinetLocation),
+                        pinNum: int.parse(amount),
+                        postId: widget.data['postId'],
+                      );
+                      if (responseStatusCode == 200) {
+                        // ignore: use_build_context_synchronously
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              contentPadding:
+                                  const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0)),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "${optionsTypeToString[currentLocation]}가 완료되었습니다.",
+                                  ),
+                                ],
+                              ),
+                              actions: <Widget>[
+                                Center(
+                                  child: SizedBox(
+                                    width: 250,
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color.fromARGB(
+                                            255, 132, 206, 243),
+                                      ),
+                                      child: const Text("확인"),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else {
+                        // ignore: use_build_context_synchronously
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              contentPadding:
+                                  const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0)),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: const [
+                                  Text(
+                                    "PIN 번호가 올바르지 않습니다.",
+                                  ),
+                                ],
+                              ),
+                              actions: <Widget>[
+                                Center(
+                                  child: SizedBox(
+                                    width: 250,
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color.fromARGB(
+                                            255, 132, 206, 243),
+                                      ),
+                                      child: const Text("확인"),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
+                    }
+                    // PIN 해제(이용자)
+                    else if (optionsTypeToString[currentLocation] ==
+                            optionsTypeToString["auth"] &&
+                        widget.data["username"] != UserInfo.userId) {
+                      await _sendPINDataToServer(
+                        cabinetNum: int.parse(cabinetLocation),
+                        pinNum: int.parse(amount),
+                        postId: widget.data['postId'],
+                      );
+                      if (responseStatusCode == 200) {
+                        // ignore: use_build_context_synchronously
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              contentPadding:
+                                  const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0)),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "${optionsTypeToString[currentLocation]}가 완료되었습니다.",
+                                  ),
+                                ],
+                              ),
+                              actions: <Widget>[
+                                Center(
+                                  child: SizedBox(
+                                    width: 250,
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color.fromARGB(
+                                            255, 132, 206, 243),
+                                      ),
+                                      child: const Text("확인"),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else {
+                        // ignore: use_build_context_synchronously
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              contentPadding:
+                                  const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0)),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: const [
+                                  Text(
+                                    "PIN 번호가 올바르지 않습니다.",
+                                  ),
+                                ],
+                              ),
+                              actions: <Widget>[
+                                Center(
+                                  child: SizedBox(
+                                    width: 250,
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color.fromARGB(
+                                            255, 132, 206, 243),
+                                      ),
+                                      child: const Text("확인"),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
+                    } else {
+                      print(UserInfo.userId);
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            contentPadding:
+                                const EdgeInsets.fromLTRB(0, 20, 0, 5),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0)),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "게시글 작성자만 ${optionsTypeToString["setting"]}이 가능합니다.",
+                                ),
+                              ],
+                            ),
+                            actions: <Widget>[
+                              Center(
+                                child: SizedBox(
+                                  width: 250,
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color.fromARGB(
+                                          255, 132, 206, 243),
+                                    ),
+                                    child: const Text("확인"),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
                   }
                 },
                 minWidth: double.infinity,
@@ -303,54 +625,52 @@ class _PINState extends State<PIN> {
     );
   }
 
+  //
   Widget renderCabinetNumber() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(40, 20, 0, 10),
-      child: GestureDetector(
-        onTap: () {},
-        child: PopupMenuButton<String>(
-          offset: const Offset(0, 30),
-          shape: ShapeBorder.lerp(
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-              1),
-          onSelected: (String value) {
-            setState(() {
-              cabinetLocation = value;
-            });
-          },
-          itemBuilder: (BuildContext context) {
-            return [
-              const PopupMenuItem(
-                value: "1",
-                child: Text("1번 캐비넷"),
-              ),
-              const PopupMenuItem(
-                value: "2",
-                child: Text("2번 캐비넷"),
-              ),
-            ];
-          },
-          //좌측 상단 판매, 구매, 대여 선택바
-          child: SizedBox(
-            width: 130,
-            child: Row(
-              children: [
-                //앱 내에서 좌측 상단바 출력을 위한 데이터
-                Text(
-                  cabinetNumberToString[cabinetLocation]!,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 20,
-                  ),
-                ),
-                const Icon(
-                  Icons.arrow_drop_down,
-                  color: Colors.black,
-                ),
-              ],
+      child: PopupMenuButton<String>(
+        offset: const Offset(0, 30),
+        shape: ShapeBorder.lerp(
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+            1),
+        onSelected: (String value) {
+          setState(() {
+            cabinetLocation = value;
+          });
+        },
+        itemBuilder: (BuildContext context) {
+          return [
+            const PopupMenuItem(
+              value: "1",
+              child: Text("1번 캐비넷"),
             ),
+            const PopupMenuItem(
+              value: "2",
+              child: Text("2번 캐비넷"),
+            ),
+          ];
+        },
+        //좌측 상단 판매, 구매, 대여 선택바
+        child: SizedBox(
+          width: 130,
+          child: Row(
+            children: [
+              //앱 내에서 좌측 상단바 출력을 위한 데이터
+              Text(
+                cabinetNumberToString[cabinetLocation]!,
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 20,
+                ),
+              ),
+              const Icon(
+                Icons.arrow_drop_down,
+                color: Colors.black,
+              ),
+            ],
           ),
         ),
       ),
@@ -363,6 +683,7 @@ class _PINState extends State<PIN> {
     required int postId,
     required int pinNum,
   }) async {
+    // 서버에 pin 번호를 보내는 주소 -> 바뀔 가능성 O
     final uri = Uri.parse('https://ubuntu.i4624.tk/pin/$currentLocation');
     final headers = {
       'Content-Type': 'application/json',
@@ -381,10 +702,18 @@ class _PINState extends State<PIN> {
         )
         .timeout(const Duration(seconds: 5));
     if (response.statusCode == 200) {
+      setState(() {
+        responseStatusCode = response.statusCode;
+      });
       print(response.statusCode);
+      return response.statusCode;
     } else {
+      setState(() {
+        responseStatusCode = response.statusCode;
+      });
+      print(response.body);
       print(response.statusCode);
-      throw Exception('Failed to send total data');
+      //throw Exception('Failed to send total data');
     }
   }
 

@@ -37,78 +37,53 @@ class _HomeState extends State<Home> {
 
   PreferredSizeWidget _appbarWidget() {
     return AppBar(
-      title: GestureDetector(
-        onTap: () {
-          ContentsRepository().loadData();
+      title: PopupMenuButton<String>(
+        offset: const Offset(0, 30),
+        shape: ShapeBorder.lerp(
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+            1),
+        onSelected: (String value) {
+          setState(() {
+            currentLocation = value;
+          });
         },
-        child: PopupMenuButton<String>(
-          offset: const Offset(0, 30),
-          shape: ShapeBorder.lerp(
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-              1),
-          onSelected: (String value) {
-            setState(() {
-              currentLocation = value;
-            });
-          },
-          itemBuilder: (BuildContext context) {
-            return [
-              const PopupMenuItem(
-                value: "sell",
-                child: Text("판매"),
-              ),
-              const PopupMenuItem(
-                value: "buy",
-                child: Text("구매"),
-              ),
-              const PopupMenuItem(
-                value: "rental",
-                child: Text("대여"),
-              ),
-            ];
-          },
-          //좌측 상단 판매, 구매, 대여 선택바
-          child: Row(
-            children: [
-              //앱 내에서 좌측 상단바 출력을 위한 데이터
-              Text(
-                optionsTypeToString[currentLocation]!,
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const Icon(
-                Icons.arrow_drop_down,
+        itemBuilder: (BuildContext context) {
+          return [
+            const PopupMenuItem(
+              value: "sell",
+              child: Text("판매"),
+            ),
+            const PopupMenuItem(
+              value: "buy",
+              child: Text("구매"),
+            ),
+            const PopupMenuItem(
+              value: "rental",
+              child: Text("대여"),
+            ),
+          ];
+        },
+        //좌측 상단 판매, 구매, 대여 선택바
+        child: Row(
+          children: [
+            //앱 내에서 좌측 상단바 출력을 위한 데이터
+            Text(
+              optionsTypeToString[currentLocation]!,
+              style: const TextStyle(
                 color: Colors.black,
+                fontWeight: FontWeight.w600,
               ),
-            ],
-          ),
+            ),
+            const Icon(
+              Icons.arrow_drop_down,
+              color: Colors.black,
+            ),
+          ],
         ),
       ),
-      backgroundColor: const Color.fromARGB(
-          255, 192, 234, 255), //const Color.fromARGB(255, 184, 210, 255),
-      elevation: 1.5, // 그림자를 표현되는 높이 3d 측면의 높이를 뜻함.
-      actions: const [
-        // IconButton(
-        //   onPressed: () {},
-        //   icon: const Icon(
-        //     Icons.search,
-        //     color: Colors.black,
-        //   ),
-        // ),
-        // Padding(
-        //   padding: const EdgeInsets.only(right: 10),
-        //   child: IconButton(
-        //     onPressed: () {},
-        //     icon: const Icon(
-        //       Icons.more_vert,
-        //       color: Colors.black,
-        //     ),
-        //   ),
-        // ),
-      ],
+      backgroundColor: const Color.fromARGB(255, 192, 234, 255),
+      elevation: 1.5,
     );
   }
 
@@ -133,30 +108,12 @@ class _HomeState extends State<Home> {
     return responseData;
   }
 
-  //수정 필요 -> 이미지 로딩바 구현
-  // Widget _loadingImageInterface(List<Map<String, dynamic>>? datas, index) {
-  //   return Image.network(
-  //     datas![index]["image"][0],
-  //     width: 100,
-  //     height: 100,
-  //     scale: 1,
-  //     fit: BoxFit.cover,
-  //     errorBuilder:
-  //         (BuildContext context, Object exception, StackTrace? stackTrace) {
-  //       return Image.asset(
-  //         "assets/images/404 Error.jpg",
-  //         width: 100,
-  //         height: 100,
-  //       );
-  //     },
-  //   );
-  // }
-
   Widget _makeDataList(List<Map<String, dynamic>>? datas) {
     int size = datas == null ? 0 : datas.length;
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       itemBuilder: (BuildContext context, int index) {
+        // 이미지가 비었을 경우 빈 이미지를 구현하기 위한 코드
         if (datas[index]["imageList"].isEmpty) {
           datas[index]["imageList"] = [""];
         }
@@ -180,18 +137,7 @@ class _HomeState extends State<Home> {
                   borderRadius: const BorderRadius.all(
                     Radius.circular(10),
                   ),
-                  child:
-                      // CachedNetworkImage(
-                      //   width: 100,
-                      //   height: 100,
-                      //   imageUrl: datas[index]["imageList"][0],
-                      //   // placeholder: Image.asset(
-                      //   //   "assets/images/No_image.jpg",
-                      //   // ),
-                      //   errorWidget: (context, url, error) =>
-                      //       const Icon(Icons.error),
-                      // ),
-                      Image.network(
+                  child: Image.network(
                     datas[index]["imageList"][0],
                     width: 100,
                     height: 100,
@@ -210,12 +156,13 @@ class _HomeState extends State<Home> {
                       if (loadingProgress == null) {
                         return child;
                       }
+                      // 이미지 로딩 중에 표시할 에셋
                       return Image.asset(
                         'assets/images/loading_placeholder.gif',
                         width: 100,
                         height: 100,
                         scale: 1,
-                        fit: BoxFit.cover, // 로딩 중에 표시할 위젯
+                        fit: BoxFit.cover,
                       );
                     },
                   ),
@@ -256,6 +203,7 @@ class _HomeState extends State<Home> {
                         const SizedBox(
                           height: 5,
                         ),
+                        // 게시글의 조회수와 좋아요를 표시하는 기능 -> 구현 예정
                         // Expanded(
                         //   child: Row(
                         //     mainAxisAlignment: MainAxisAlignment.end,
@@ -285,7 +233,7 @@ class _HomeState extends State<Home> {
           ),
         );
       },
-      itemCount: datas!.length, // 상품 목록의 개수
+      itemCount: datas!.length,
       separatorBuilder: (BuildContext context, int index) {
         return Container(
           height: 1,
@@ -295,7 +243,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  // 제품 목록을 보여주는 body //원본 코드
+  // 제품 목록을 보여주는 body
   Widget _bodyWidget() {
     return FutureBuilder(
         future: _loadContents(),
@@ -319,12 +267,13 @@ class _HomeState extends State<Home> {
       home: Scaffold(
         appBar: _appbarWidget(),
         body: RefreshIndicator(
-            onRefresh: () async {
-              setState(() {
-                _bodyWidget();
-              });
-            },
-            child: _bodyWidget()),
+          onRefresh: () async {
+            setState(() {
+              _bodyWidget();
+            });
+          },
+          child: _bodyWidget(),
+        ),
       ),
     );
   }

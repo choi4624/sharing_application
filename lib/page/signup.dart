@@ -30,7 +30,6 @@ class _SignUpState extends State<SignUp> {
     label,
     obsureText = false,
   }) {
-  Widget makeInput({label, obsureText = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -60,12 +59,11 @@ class _SignUpState extends State<SignUp> {
         ),
         const SizedBox(
           height: 20,
-          height: 30,
         )
       ],
     );
   }
-    
+
   Widget makeIntInput({
     required TextEditingController controller,
     label,
@@ -243,7 +241,7 @@ class _SignUpState extends State<SignUp> {
     return SafeArea(
       child: SingleChildScrollView(
         child: SizedBox(
-          height: MediaQuery.of(context).size.height,
+          //height: MediaQuery.of(context).size.height,
           width: double.infinity,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -290,12 +288,6 @@ class _SignUpState extends State<SignUp> {
                             const SizedBox(
                               height: 30,
                             ),
-                            makeInput(label: "이름"),
-                            makeInput(label: "전화번호"),
-                            makeInput(label: "ID"),
-                            makeInput(label: "Password", obsureText: true),
-                            makeInput(
-                                label: "Confirm Pasword", obsureText: true)
                           ],
                         ),
                       ],
@@ -694,7 +686,6 @@ class _SignUpState extends State<SignUp> {
                             }
                           }
                         },
-                        onPressed: () {},
                         //color: Colors.redAccent,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(40)),
