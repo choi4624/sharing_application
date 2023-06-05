@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+// 유저 데이터를 저장하는 클래스
 class UserInfo {
   static late String userId;
-  //late String name = "홍길동";
   late String password;
   static late String jwt;
 
@@ -16,6 +16,7 @@ class UserInfo {
   }
 }
 
+// 서버로 부터 받은 게시글 데이터를 다루는 클래스
 class ContentsRepository {
   //서버를 통해 받는 게시글 데이터의 원본을 저장하는 변수
   Map<String, dynamic> originBoardDatas = {};
@@ -40,7 +41,6 @@ class ContentsRepository {
     if (response.statusCode == 200) {
       final Map<String, dynamic> responseData =
           jsonDecode(utf8.decode(response.bodyBytes));
-      //convertData(originBoardDatas);
       originBoardDatas = responseData;
       print(originBoardDatas);
       return responseData;
@@ -54,7 +54,7 @@ class ContentsRepository {
     try {
       originBoardDatas = await loadData();
       convertData(originBoardDatas);
-      print(originBoardDatas);
+      //print(originBoardDatas);
       print(mainBoardDatas);
     } catch (e) {
       print('Failed to load data: $e');

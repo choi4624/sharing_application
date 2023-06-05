@@ -30,6 +30,7 @@ class _ControlState extends State<Control> {
     }
   }
 
+  // 바텀 네이게이션의 아이콘
   BottomNavigationBarItem _bottomNavigationBarItem(
       String iconName, String label) {
     return BottomNavigationBarItem(

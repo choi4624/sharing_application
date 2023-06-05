@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class KeyboardKey extends StatefulWidget {
+class NumKeyboardKey extends StatefulWidget {
   final dynamic label;
   final dynamic value;
   final ValueSetter<dynamic> onTap;
 
-  const KeyboardKey({
+  const NumKeyboardKey({
     super.key,
     @required this.label,
     @required this.value,
@@ -13,10 +13,10 @@ class KeyboardKey extends StatefulWidget {
   });
 
   @override
-  _KeyboardKeyState createState() => _KeyboardKeyState();
+  State<NumKeyboardKey> createState() => _NumKeyboardKeyState();
 }
 
-class _KeyboardKeyState extends State<KeyboardKey> {
+class _NumKeyboardKeyState extends State<NumKeyboardKey> {
   renderLabel() {
     if (widget.label is Widget) {
       return widget.label;
