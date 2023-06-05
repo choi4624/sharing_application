@@ -1,19 +1,39 @@
-# sharing_application currently test_project name use 
+# ST_Share_UI
+
+UI 및 프론트엔드 작업
+
+## 구현 기능
+1. 로그인 기능 : ?
+2. 메인(게시글 화면) : 80%
+3. 게시글 작성 페이지 : 80%
+4. 지도 페이지 : 30%
+5. 채팅 페이지 : 0%
+6. 유저 페이지 : ?%
+6. 상품 개별(디테일) 페이지 : 70%
 
 
-# test_project
+## 현재 작업중
+2. 게시글 작성 페이지
+~~- 사용자 이미지 저장~~
+~~- 사용자 이미지 데이터 Post~~
+~~- imageUid Json Get~~
+~~- Json형식의 데이터 변수화~~
+~~- 사용자의 입력 정보 저장~~
+- 사용자의 입력 정보 Post : 테스트 필요
 
-A new Flutter project.
+3. 지도 페이지
+~~- API를 통해 지도 출력~~
+~~- 검색 기능을 통해 해당 좌표로 이동~~
+- 마커 표시 : 0%
+- 마커를 통한 리스트 구현 : 0%
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 수정 및 구현이 필요한 기능
+- 로그인 기능
+- 게시글 검색 기능
+- 게시글 및 상품 개별(디테일) 페이지 이미지 로딩 속도 향상
+- 상품 개별(디테일) 페이지 이미지 슬라이드 기능 개선
+- 지도 마커 표시 기능
+- 지도에서 마커를 눌렀을 때 해당 마커에 게시글 데이터를 이용한 리스트 구현
+- 채팅 기능(개발이 어려울 시 오픈카톡)
+- 유저 페이지(UI 및 기능) 구현

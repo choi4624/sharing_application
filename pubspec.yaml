@@ -31,10 +31,38 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^0.13.5
-  flutter_html: ^2.2.1
+  # flutter_html: ^2.0.0
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
+  flutter_svg: ^0.22.0
+  intl: ^0.18.0
+  carousel_slider: ^4.2.1
+  dio: ^5.0.3 #서버 Post
+  image_picker: ^0.8.7 #이미지 변수
+  kpostal: ^0.5.1 #카카오 주소검색 
+  flutter_naver_map: ^1.0.0 #네이버 맵 
+  path_provider: ^2.0.14 #네이버 맵 
+  crypto: ^3.0.2 #네이버 맵 
+  pull_to_refresh: ^2.0.0
+  location: ^4.4.0 #지도 이동 
+  geolocator: ^9.0.2 #지도 이동(2)
+  html_editor_enhanced: ^2.5.1
+  flutter_widget_from_html_core: ^0.10.0
+  #flutter_styled_toast: ^2.1.3
+  permission_handler: ^10.2.0
+  flutter_bottom_drawer: ^0.0.6
+  latlng: ^0.2.1
+  geocoding: ^2.1.0
+  http_parser: ^4.0.2
+  flutter_typeahead: ^4.3.7
+  shared_preferences: ^2.1.0
+  snapping_sheet: ^3.1.0
+  webview_flutter: ^4.0.5
+  kakao_map_plugin: ^0.1.3
+  flutter_inappwebview: ^5.7.2+3
+  cached_network_image: ^3.2.3
 
 dev_dependencies:
   flutter_test:
@@ -59,10 +87,10 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
-
+  assets:
+    - assets/
+    - assets/svg/
+    - assets/images/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 
